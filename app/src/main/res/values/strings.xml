@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">GameOfThronesCharacters</string>
+    <string name="character_navigation_icon">Character navigation icon</string>
+    <string name="favorites_navigation_icon">Favorites navigation icon</string>
+    <string name="settings_navigation_icon">Settings navigation icon</string>
+    <string name="character">Character</string>
+    <string name="settings">Settings</string>
+    <string name="favorites">Favorites</string>
 </resources>

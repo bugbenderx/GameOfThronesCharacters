@@ -11,7 +11,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.bugbender.gameofthronescharacters.ui.theme.GameOfThronesCharactersTheme
+import androidx.navigation.compose.rememberNavController
+import com.bugbender.gameofthronescharacters.navigation.AppNavHost
+import com.bugbender.gameofthronescharacters.navigation.AppNavigationBar
+import com.bugbender.gameofthronescharacters.core.theme.GameOfThronesCharactersTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +22,23 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GameOfThronesCharactersTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                GameOfThronesCharactersApp()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun GameOfThronesCharactersApp() {
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GameOfThronesCharactersTheme {
-        Greeting("Android")
+    Scaffold(
+        bottomBar = {
+            AppNavigationBar(navController)
+        }
+    ) {  innerPadding ->
+        AppNavHost(
+            navController = navController
+        )
     }
 }
