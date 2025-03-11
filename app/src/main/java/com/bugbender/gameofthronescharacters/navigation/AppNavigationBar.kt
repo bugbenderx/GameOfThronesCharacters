@@ -1,8 +1,10 @@
 package com.bugbender.gameofthronescharacters.navigation
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,6 +19,10 @@ import com.bugbender.gameofthronescharacters.R
 fun AppNavigationBar(navController: NavHostController) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
+    val navBarItemColors = NavigationBarItemDefaults.colors(
+        unselectedIconColor = MaterialTheme.colorScheme.outline,
+        unselectedTextColor = MaterialTheme.colorScheme.outline,
+    )
 
     NavigationBar {
         NavigationBarItem(
@@ -32,7 +38,8 @@ fun AppNavigationBar(navController: NavHostController) {
             },
             label = {
                 Text(text = stringResource(R.string.character))
-            }
+            },
+            colors = navBarItemColors
         )
         NavigationBarItem(
             selected = currentDestination?.hasRoute<FavoritesRoute>() ?: false,
@@ -47,7 +54,8 @@ fun AppNavigationBar(navController: NavHostController) {
             },
             label = {
                 Text(text = stringResource(R.string.favorites))
-            }
+            },
+            colors = navBarItemColors
         )
         NavigationBarItem(
             selected = currentDestination?.hasRoute<SettingsRoute>() ?: false,
@@ -62,7 +70,8 @@ fun AppNavigationBar(navController: NavHostController) {
             },
             label = {
                 Text(text = stringResource(R.string.settings))
-            }
+            },
+            colors = navBarItemColors
         )
     }
 }
