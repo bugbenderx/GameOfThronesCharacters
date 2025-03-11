@@ -1,4 +1,4 @@
-package com.bugbender.gameofthronescharacters.core.theme
+package com.bugbender.gameofthronescharacters.core.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
