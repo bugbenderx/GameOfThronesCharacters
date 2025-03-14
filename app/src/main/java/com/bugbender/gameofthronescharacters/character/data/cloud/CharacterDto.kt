@@ -3,7 +3,7 @@ package com.bugbender.gameofthronescharacters.character.data.cloud
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CharacterDTO(
+data class CharacterDto(
     val id: Int,
     val name: String,
     val actor: String,

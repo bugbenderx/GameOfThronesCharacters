@@ -13,6 +13,6 @@ interface CharacterCloudDataSource {
     ) : CharacterCloudDataSource {
 
         override suspend fun getRandom(): CharacterData =
-            apiService.getRandom().map(CharacterDTOToDataMapper)
+            apiService.getRandom().map(CharacterDtoToDataMapper)
     }
 }

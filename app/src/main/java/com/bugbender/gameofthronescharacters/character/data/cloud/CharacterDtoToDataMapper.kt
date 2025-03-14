@@ -2,7 +2,7 @@ package com.bugbender.gameofthronescharacters.character.data.cloud
 
 import com.bugbender.gameofthronescharacters.character.data.CharacterData
 
-object CharacterDTOToDataMapper : CharacterDTO.Mapper<CharacterData> {
+object CharacterDtoToDataMapper : CharacterDto.Mapper<CharacterData> {
     override fun map(
         id: Int,
         name: String,

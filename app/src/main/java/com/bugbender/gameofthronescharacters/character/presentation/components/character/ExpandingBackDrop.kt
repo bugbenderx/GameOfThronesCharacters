@@ -1,7 +1,12 @@
-package com.bugbender.gameofthronescharacters.character.presentation.components
+package com.bugbender.gameofthronescharacters.character.presentation.components.character
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -9,11 +14,15 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,6 +34,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -43,26 +53,35 @@ import kotlin.math.roundToInt
 
 @Composable
 fun ExpandingBackDrop(
-    topBarHeight: Dp,
     topBarContent: @Composable () -> Unit,
     backLayerContent: @Composable () -> Unit,
+    backLayerHeightFraction: Float = 0.8f,
     frontLayerContent: @Composable () -> Unit,
     frontLayerTopCornerRadius: Dp = 16.dp,
     frontLayerPaddingContent: Dp = 8.dp,
-    enableAutoSnap: Boolean = true
+    enableAutoSnap: Boolean = true,
+    revealedContent: @Composable () -> Unit,
 ) {
+    var topBarHeightPx by remember { mutableIntStateOf(0) }
+    var backLayerHeightPx by remember { mutableIntStateOf(0) }
+    val readyToShow by remember { derivedStateOf { backLayerHeightPx > 0 } }
+
     val density = LocalDensity.current
-    val topBarHeightPx = with(density) { topBarHeight.toPx() }
     val frontLayerTopCornerRadiusPx = with(density) { frontLayerTopCornerRadius.toPx() }
     val frontLayerPaddingContentPx = with(density) { frontLayerPaddingContent.toPx() }
 
-    var backLayerHeightPx by remember { mutableIntStateOf(0) }
-
+    val frontLayerMinTopOffset by remember {
+        derivedStateOf { topBarHeightPx - frontLayerPaddingContentPx }
+    }
     val frontLayerMaxTopOffset by remember {
         derivedStateOf { backLayerHeightPx - frontLayerTopCornerRadiusPx }
     }
     val frontLayerOffset = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
+
+    val showRevealedContent by remember {
+        derivedStateOf { frontLayerMinTopOffset + frontLayerPaddingContentPx >= frontLayerOffset.value }
+    }
 
     Box(
         modifier = Modifier
@@ -70,68 +89,85 @@ fun ExpandingBackDrop(
             .background(MaterialTheme.colorScheme.surface)
     ) {
 
-        TopBar(
-            content = topBarContent,
-            modifier = Modifier
-                .height(topBarHeight)
-                .graphicsLayer {
-                    val topBarVisibilityProgress = ((backLayerHeightPx - frontLayerOffset.value) /
-                            (backLayerHeightPx - topBarHeightPx)).coerceIn(0f, 1f)
-                    // Linear interpolation for translationY: fully hidden = -topBarHeightPx, fully visible = 0f.
-                    translationY = -topBarHeightPx * (1 - topBarVisibilityProgress)
-                    alpha = topBarVisibilityProgress
-                }
-        )
-
         BackLayer(
             content = backLayerContent,
             modifier = Modifier
+                .fillMaxHeight(backLayerHeightFraction)
                 .onGloballyPositioned { coordinates ->
                     backLayerHeightPx = coordinates.size.height
                 }
                 .graphicsLayer {
-
                     val scrollValue = frontLayerMaxTopOffset - frontLayerOffset.value
                     translationY = -scrollValue
                     alpha = (-1f / (frontLayerMaxTopOffset - topBarHeightPx)) * scrollValue + 1
                 }
         )
 
-        FrontLayer(
-            content = frontLayerContent,
-            padding = frontLayerPaddingContent,
-            topCornerRadius = frontLayerTopCornerRadius,
-            modifier = Modifier
-                .offset { IntOffset(0, frontLayerOffset.value.roundToInt()) }
-                .draggable(
-                    state = rememberDraggableState { delta ->
-                        coroutineScope.launch {
-                            frontLayerOffset.snapTo(
-                                (frontLayerOffset.value + delta).coerceIn(
-                                    topBarHeightPx - frontLayerPaddingContentPx,
-                                    backLayerHeightPx.toFloat() - frontLayerTopCornerRadiusPx
-                                )
-                            )
-                        }
-                    },
-                    orientation = Orientation.Vertical,
-                    onDragStopped = {
-                        if (enableAutoSnap) {
+        if (readyToShow) {
+            TopBar(
+                content = topBarContent,
+                modifier = Modifier
+                    .onGloballyPositioned { coordinates ->
+                        topBarHeightPx = coordinates.size.height
+                    }
+                    .graphicsLayer {
+                        val topBarVisibilityProgress =
+                            ((backLayerHeightPx - frontLayerOffset.value) /
+                                    (backLayerHeightPx - topBarHeightPx)).coerceIn(0f, 1f)
+                        // Linear interpolation for translationY: fully hidden = -topBarHeightPx, fully visible = 0f.
+                        translationY = -topBarHeightPx * (1 - topBarVisibilityProgress)
+                        alpha = topBarVisibilityProgress
+                    }
+            )
+
+            FrontLayer(
+                content = frontLayerContent,
+                padding = frontLayerPaddingContent,
+                topCornerRadius = frontLayerTopCornerRadius,
+                modifier = Modifier
+                    .offset { IntOffset(0, frontLayerOffset.value.roundToInt()) }
+                    .draggable(
+                        state = rememberDraggableState { delta ->
                             coroutineScope.launch {
-                                val target = if (frontLayerOffset.value < backLayerHeightPx / 2f)
-                                    topBarHeightPx - frontLayerPaddingContentPx
-                                else backLayerHeightPx.toFloat() - frontLayerTopCornerRadiusPx
-                                frontLayerOffset.animateTo(target, tween(300))
+                                frontLayerOffset.snapTo(
+                                    (frontLayerOffset.value + delta).coerceIn(
+                                        frontLayerMinTopOffset,
+                                        backLayerHeightPx.toFloat() - frontLayerTopCornerRadiusPx
+                                    )
+                                )
+                            }
+                        },
+                        orientation = Orientation.Vertical,
+                        onDragStopped = {
+                            if (enableAutoSnap) {
+                                coroutineScope.launch {
+                                    val target =
+                                        if (frontLayerOffset.value < backLayerHeightPx / 2f)
+                                            frontLayerMinTopOffset
+                                        else
+                                            frontLayerMaxTopOffset
+
+                                    frontLayerOffset.animateTo(target, tween(300))
+                                }
                             }
                         }
-                    }
-                )
-        )
+                    )
+            )
+        }
+
+        AnimatedVisibility(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            visible = showRevealedContent,
+            enter = fadeIn() + scaleIn(),
+            exit = fadeOut() + scaleOut()
+        ) {
+            revealedContent()
+        }
     }
 
     LaunchedEffect(Unit) {
         // Set initial position at the bottom
-        frontLayerOffset.snapTo(backLayerHeightPx.toFloat() - frontLayerTopCornerRadiusPx)
+        frontLayerOffset.snapTo(frontLayerMaxTopOffset)
     }
 }
 
@@ -142,6 +178,7 @@ private fun TopBar(
 ) {
     Box(
         modifier = modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
             .fillMaxWidth()
             .zIndex(1f)
     ) {
@@ -155,12 +192,10 @@ private fun BackLayer(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         content()
     }
-
 }
 
 @Composable
@@ -172,7 +207,7 @@ private fun FrontLayer(
 ) {
     Box(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(
@@ -191,7 +226,6 @@ private fun FrontLayer(
 private fun DraggableFrontLayerLayoutPreview() {
     GameOfThronesCharactersTheme {
         ExpandingBackDrop(
-            topBarHeight = 72.dp,
             topBarContent = {
                 Column(
                     modifier = Modifier
@@ -225,7 +259,8 @@ private fun DraggableFrontLayerLayoutPreview() {
             },
             frontLayerContent = {
                 Text("Front Layer - Drag Me!", fontSize = 24.sp, color = Color.Black)
-            }
+            },
+            revealedContent = {}
         )
     }
 }

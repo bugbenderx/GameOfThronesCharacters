@@ -7,13 +7,13 @@ import javax.inject.Inject
 
 interface CharacterApiService {
 
-    suspend fun getRandom(): CharacterDTO
+    suspend fun getRandom(): CharacterDto
 
     class Impl @Inject constructor(private val client: HttpClient) : CharacterApiService {
 
-        override suspend fun getRandom(): CharacterDTO =
+        override suspend fun getRandom(): CharacterDto =
             client
                 .get("/characters/random")
-                .body<CharacterDTO>()
+                .body<CharacterDto>()
     }
 }
