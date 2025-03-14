@@ -12,24 +12,18 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.bugbender.gameofthronescharacters.character.presentation.CharacterScreen
 
 @Composable
-fun AppNavHost(navController: NavHostController) {
+fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
 
     NavHost(
         navController = navController,
         startDestination = CharacterRoute,
+        modifier = modifier
     ) {
         composable<CharacterRoute> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.onSurfaceVariant)
-
-            ) {
-                Text(text = "CharacterScreen")
-            }
+            CharacterScreen()
         }
         composable<FavoritesRoute> {
             Box(

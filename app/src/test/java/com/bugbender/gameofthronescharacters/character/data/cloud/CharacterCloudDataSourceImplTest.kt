@@ -28,7 +28,7 @@ class CharacterCloudDataSourceImplTest {
 
 class FakeCharacterApiService : CharacterApiService {
 
-    override suspend fun getRandom() = CharacterDTO(
+    override suspend fun getRandom() = CharacterDto(
         id = 22,
         name = "Jon Snow",
         actor = "Kit Harington",

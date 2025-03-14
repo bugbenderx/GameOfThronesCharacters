@@ -48,7 +48,7 @@ class CharacterApiServiceTest {
         val apiService = CharacterApiService.Impl(client)
 
         val resultDTO = apiService.getRandom()
-        val expectedDTO = CharacterDTO(
+        val expectedDTO = CharacterDto(
             id = 1,
             name = "Jon Snow",
             actor = "Kit Harington",

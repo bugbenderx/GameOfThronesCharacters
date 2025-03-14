@@ -8,4 +8,11 @@
     <string name="favorites">Favorites</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="service_unavailable_try_later">Service unavailable, try later</string>
+    <string name="next_random_character_icon_button">Next random character icon button</string>
+    <string name="rank">Rank #%1$s</string>
+    <string name="share_character_icon_button">Share character icon button</string>
+    <string name="change_favorite_status_icon_button">Change favorite status icon button</string>
+    <string name="try_again">Try Again</string>
+    <string name="description">Description</string>
+    <string name="memorableMoments">Memorable moments</string>
 </resources>
