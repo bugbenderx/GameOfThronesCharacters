@@ -54,7 +54,7 @@ fun CharacterErrorContent(
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "$advice\nPlease try again!",
+                text = advice,
                 color = MaterialTheme.colorScheme.surface,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center

@@ -24,7 +24,7 @@ class CharacterRepositoryImpl @Inject constructor(
             val isFavorite = cacheDataSource.isExists(characterData.id)
             LoadResult.Success(characterData.map(CharacterDataToDomainMapper(isFavorite)))
         } catch (e: Exception) {
-            LoadResult.Error(message = handleError.handle(e))
+            val (message, advice) = handleError.handle(e)
+            LoadResult.Error(message = message, advice = advice)
         }
 }
-

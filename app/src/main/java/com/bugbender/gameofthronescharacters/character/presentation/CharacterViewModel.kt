@@ -33,7 +33,7 @@ class CharacterViewModel @Inject constructor(
                 }
 
                 is LoadResult.Error -> {
-                    _screenState.value = ScreenState.Error(result.message)
+                    _screenState.value = ScreenState.Error(result.message, result.advice)
                 }
             }
         }
@@ -41,9 +41,8 @@ class CharacterViewModel @Inject constructor(
 
     sealed interface ScreenState {
         data object Loading : ScreenState
-        data class Error(val message: String) : ScreenState
+        data class Error(val message: String, val advice: String) : ScreenState
         data class Success(val character: CharacterUi) : ScreenState
         data object Empty : ScreenState
     }
 }
-
