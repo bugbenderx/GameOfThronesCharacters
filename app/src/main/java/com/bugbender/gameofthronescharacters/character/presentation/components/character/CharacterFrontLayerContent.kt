@@ -12,16 +12,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,12 +41,18 @@ sealed class CharacterTabs(@StringRes val textId: Int) {
 }
 
 @Composable
-fun CharacterFrontLayerContent(tabs: List<CharacterTabs>) {
+fun CharacterFrontLayerContent(
+    tabs: List<CharacterTabs>,
+    isScrollEnabled: Boolean,
+) {
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val selectedTabIndex by remember { derivedStateOf { pagerState.currentPage } }
 
-    Column {
+    var availableHeightPx by remember { mutableIntStateOf(0) }
+    var contentFullHeightPx by remember { mutableIntStateOf(0) }
+
+    Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier.fillMaxWidth()) {
 
             tabs.forEachIndexed { index, currentTab ->
@@ -72,26 +83,42 @@ fun CharacterFrontLayerContent(tabs: List<CharacterTabs>) {
         HorizontalPager(
             state = pagerState,
             verticalAlignment = Alignment.Top,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            when (val tab = tabs[selectedTabIndex]) {
-                is CharacterTabs.Description -> {
-                    Text(
-                        text = tab.text,
-                        color = MaterialTheme.colorScheme.outline,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+            modifier = Modifier
+                .fillMaxSize()
+                .onGloballyPositioned { coordinates ->
+                    availableHeightPx = coordinates.size.height
                 }
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { coordinates ->
+                        contentFullHeightPx = maxOf(contentFullHeightPx, coordinates.size.height)
+                    }
+                    .verticalScroll(
+                        state = rememberScrollState(),
+                        enabled = isScrollEnabled && (contentFullHeightPx > availableHeightPx)
+                    )
+            ) {
+                when (val tab = tabs[selectedTabIndex]) {
 
-                is CharacterTabs.MemorableMoments -> {
-                    Column {
-                        tab.list.forEach {
+                    is CharacterTabs.Description -> {
+                        Text(
+                            text = tab.text,
+                            color = MaterialTheme.colorScheme.outline,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
+
+                    is CharacterTabs.MemorableMoments -> {
+                        tab.list.forEachIndexed { index, text ->
                             Text(
-                                text = it,
+                                text = text,
                                 color = MaterialTheme.colorScheme.outline,
                                 style = MaterialTheme.typography.bodyLarge
                             )
-                            Spacer(Modifier.height(8.dp))
+                            if (index != tab.list.lastIndex)
+                                Spacer(Modifier.height(8.dp))
                         }
                     }
                 }
@@ -114,7 +141,8 @@ private fun CharacterFrontLayerPreview() {
                         "Being resurrected by Melisandre in Season 6, surprising everyone who believed him dead."
                     )
                 )
-            )
+            ),
+            isScrollEnabled = true
         )
     }
 }

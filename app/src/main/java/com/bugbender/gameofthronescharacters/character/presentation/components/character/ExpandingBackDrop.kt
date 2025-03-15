@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -56,38 +57,67 @@ fun ExpandingBackDrop(
     topBarContent: @Composable () -> Unit,
     backLayerContent: @Composable () -> Unit,
     backLayerHeightFraction: Float = 0.8f,
-    frontLayerContent: @Composable () -> Unit,
+    frontLayerContent: @Composable (Boolean) -> Unit,
     frontLayerTopCornerRadius: Dp = 16.dp,
     frontLayerPaddingContent: Dp = 8.dp,
     enableAutoSnap: Boolean = true,
     revealedContent: @Composable () -> Unit,
 ) {
+    var parentHeightPx by remember { mutableIntStateOf(0) }
     var topBarHeightPx by remember { mutableIntStateOf(0) }
     var backLayerHeightPx by remember { mutableIntStateOf(0) }
-    val readyToShow by remember { derivedStateOf { backLayerHeightPx > 0 } }
+    val isBackLayerDrawn by remember { derivedStateOf { backLayerHeightPx > 0 } }
 
     val density = LocalDensity.current
     val frontLayerTopCornerRadiusPx = with(density) { frontLayerTopCornerRadius.toPx() }
     val frontLayerPaddingContentPx = with(density) { frontLayerPaddingContent.toPx() }
 
     val frontLayerMinTopOffset by remember {
-        derivedStateOf { topBarHeightPx - frontLayerPaddingContentPx }
+        derivedStateOf { (topBarHeightPx - frontLayerPaddingContentPx).let { if (it < 0f) 0f else it } }
     }
     val frontLayerMaxTopOffset by remember {
         derivedStateOf { backLayerHeightPx - frontLayerTopCornerRadiusPx }
     }
+    val frontLayerMaxHeight by remember {
+        derivedStateOf { with(density) { (parentHeightPx - frontLayerMinTopOffset).toDp() } }
+    }
     val frontLayerOffset = remember { Animatable(0f) }
-    val coroutineScope = rememberCoroutineScope()
+
+    val isFrontLayerScrollEnabled by remember {
+        derivedStateOf { frontLayerOffset.value == frontLayerMinTopOffset }
+    }
 
     val showRevealedContent by remember {
-        derivedStateOf { frontLayerMinTopOffset + frontLayerPaddingContentPx >= frontLayerOffset.value }
+        derivedStateOf { frontLayerMinTopOffset + frontLayerPaddingContentPx > frontLayerOffset.value }
     }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
+            .onGloballyPositioned { coordinates ->
+                parentHeightPx = coordinates.size.height
+            }
     ) {
+
+        TopBar(
+            readyToShow = isBackLayerDrawn,
+            content = topBarContent,
+            modifier = Modifier
+                .onGloballyPositioned { coordinates ->
+                    topBarHeightPx = coordinates.size.height
+                }
+                .graphicsLayer {
+                    val topBarVisibilityProgress =
+                        ((backLayerHeightPx - frontLayerOffset.value) /
+                                (backLayerHeightPx - topBarHeightPx)).coerceIn(0f, 1f)
+                    // Linear interpolation for translationY: fully hidden = -topBarHeightPx, fully visible = 0f.
+                    translationY = -topBarHeightPx * (1 - topBarVisibilityProgress)
+                    alpha = topBarVisibilityProgress
+                }
+        )
 
         BackLayer(
             content = backLayerContent,
@@ -103,57 +133,40 @@ fun ExpandingBackDrop(
                 }
         )
 
-        if (readyToShow) {
-            TopBar(
-                content = topBarContent,
-                modifier = Modifier
-                    .onGloballyPositioned { coordinates ->
-                        topBarHeightPx = coordinates.size.height
-                    }
-                    .graphicsLayer {
-                        val topBarVisibilityProgress =
-                            ((backLayerHeightPx - frontLayerOffset.value) /
-                                    (backLayerHeightPx - topBarHeightPx)).coerceIn(0f, 1f)
-                        // Linear interpolation for translationY: fully hidden = -topBarHeightPx, fully visible = 0f.
-                        translationY = -topBarHeightPx * (1 - topBarVisibilityProgress)
-                        alpha = topBarVisibilityProgress
-                    }
-            )
-
-            FrontLayer(
-                content = frontLayerContent,
-                padding = frontLayerPaddingContent,
-                topCornerRadius = frontLayerTopCornerRadius,
-                modifier = Modifier
-                    .offset { IntOffset(0, frontLayerOffset.value.roundToInt()) }
-                    .draggable(
-                        state = rememberDraggableState { delta ->
-                            coroutineScope.launch {
-                                frontLayerOffset.snapTo(
-                                    (frontLayerOffset.value + delta).coerceIn(
-                                        frontLayerMinTopOffset,
-                                        backLayerHeightPx.toFloat() - frontLayerTopCornerRadiusPx
-                                    )
+        FrontLayer(
+            readyToShow = isBackLayerDrawn,
+            content = { frontLayerContent(isFrontLayerScrollEnabled) },
+            paddingContent = frontLayerPaddingContent,
+            topCornerRadius = frontLayerTopCornerRadius,
+            modifier = Modifier
+                .heightIn(max = frontLayerMaxHeight)
+                .offset { IntOffset(0, frontLayerOffset.value.roundToInt()) }
+                .draggable(
+                    state = rememberDraggableState { delta ->
+                        coroutineScope.launch {
+                            frontLayerOffset.snapTo(
+                                (frontLayerOffset.value + delta).coerceIn(
+                                    frontLayerMinTopOffset,
+                                    backLayerHeightPx.toFloat() - frontLayerTopCornerRadiusPx
                                 )
-                            }
-                        },
-                        orientation = Orientation.Vertical,
-                        onDragStopped = {
-                            if (enableAutoSnap) {
-                                coroutineScope.launch {
-                                    val target =
-                                        if (frontLayerOffset.value < backLayerHeightPx / 2f)
-                                            frontLayerMinTopOffset
-                                        else
-                                            frontLayerMaxTopOffset
-
-                                    frontLayerOffset.animateTo(target, tween(300))
-                                }
+                            )
+                        }
+                    },
+                    orientation = Orientation.Vertical,
+                    onDragStopped = {
+                        if (enableAutoSnap) {
+                            coroutineScope.launch {
+                                val target =
+                                    if (frontLayerOffset.value < backLayerHeightPx / 2f)
+                                        frontLayerMinTopOffset
+                                    else
+                                        frontLayerMaxTopOffset
+                                frontLayerOffset.animateTo(target, tween(300))
                             }
                         }
-                    )
-            )
-        }
+                    }
+                )
+        )
 
         AnimatedVisibility(
             modifier = Modifier.align(Alignment.BottomEnd),
@@ -166,23 +179,26 @@ fun ExpandingBackDrop(
     }
 
     LaunchedEffect(Unit) {
-        // Set initial position at the bottom
+        // Set initial frontLayer position at the bottom
         frontLayerOffset.snapTo(frontLayerMaxTopOffset)
     }
 }
 
 @Composable
 private fun TopBar(
+    readyToShow: Boolean,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .fillMaxWidth()
-            .zIndex(1f)
-    ) {
-        content()
+    if (readyToShow) {
+        Box(
+            modifier = modifier
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .fillMaxWidth()
+                .zIndex(1f)
+        ) {
+            content()
+        }
     }
 }
 
@@ -200,24 +216,27 @@ private fun BackLayer(
 
 @Composable
 private fun FrontLayer(
+    readyToShow: Boolean,
     content: @Composable () -> Unit,
-    padding: Dp,
+    paddingContent: Dp,
     topCornerRadius: Dp,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(
-                    topStart = topCornerRadius,
-                    topEnd = topCornerRadius
+    if (readyToShow) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(
+                        topStart = topCornerRadius,
+                        topEnd = topCornerRadius
+                    )
                 )
-            )
-            .padding(padding)
-    ) {
-        content()
+                .padding(paddingContent)
+        ) {
+            content()
+        }
     }
 }
 

@@ -37,12 +37,13 @@ fun CharacterContent(
                 onFavoriteIconClick = onFavoriteIconClick
             )
         },
-        frontLayerContent = {
+        frontLayerContent = { isScrollEnabled ->
             CharacterFrontLayerContent(
                 tabs = listOf(
                     CharacterTabs.Description(text = characterUi.description),
                     CharacterTabs.MemorableMoments(list = characterUi.memorableMoments)
-                )
+                ),
+                isScrollEnabled = isScrollEnabled
             )
         },
         revealedContent = {
