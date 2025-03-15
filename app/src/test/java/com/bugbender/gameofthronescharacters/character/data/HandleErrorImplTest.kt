@@ -18,19 +18,48 @@ class HandleErrorImplTest {
     }
 
     @Test
-    fun allScenarios() {
-        var actualMessage = handleError.handle(UnknownHostException())
-        assertEquals("noInternetConnection", actualMessage)
+    fun `test handling UnknownHostException`() {
+        // Given
+        val exception = UnknownHostException()
 
-        actualMessage = handleError.handle(Exception())
-        assertEquals("serviceUnavailableTryLater", actualMessage)
+        // When
+        val (actualMessage, actualAdvice) = handleError.handle(exception)
+
+        // Then
+        assertEquals("noInternetConnection", actualMessage)
+        assertEquals(
+            "Your device does not seem to have access to the internet.\nPlease try again!",
+            actualAdvice
+        )
     }
 
+    @Test
+    fun `test handling generic Exception`() {
+        // Given
+        val exception = Exception()
 
+        // When
+        val (actualMessage, actualAdvice) = handleError.handle(exception)
+
+        // Then
+        assertEquals("serviceUnavailableTryLater", actualMessage)
+        assertEquals(
+            "The service is temporarily unavailable.\nPlease try again later!",
+            actualAdvice
+        )
+    }
+
+    // Fake implementation of ProvideStringRes
     class FakeProvideStringRes : ProvideStringRes {
 
         override fun noInternetConnection() = "noInternetConnection"
 
-        override fun serviceUnavailableTryLater() = "serviceUnavailableTryLater"
+        override fun adviceForNoInternetConnection() =
+            "Your device does not seem to have access to the internet.\nPlease try again!"
+
+        override fun serviceUnavailable() = "serviceUnavailableTryLater"
+
+        override fun adviceForServiceUnavailable() =
+            "The service is temporarily unavailable.\nPlease try again later!"
     }
 }

@@ -7,16 +7,17 @@ import javax.inject.Singleton
 
 interface HandleError {
 
-    fun handle(e: Exception): String
+    fun handle(e: Exception): Pair<String, String>
 
     @Singleton
     class Impl @Inject constructor(private val provideStringRes: ProvideStringRes) : HandleError {
 
-        override fun handle(e: Exception): String = with(provideStringRes) {
+        override fun handle(e: Exception): Pair<String, String> = with(provideStringRes) {
             if (e is UnknownHostException) {
-                noInternetConnection()
+                Pair(noInternetConnection(), adviceForNoInternetConnection())
+
             } else {
-                serviceUnavailableTryLater()
+                Pair(serviceUnavailable(), adviceForServiceUnavailable())
             }
         }
     }

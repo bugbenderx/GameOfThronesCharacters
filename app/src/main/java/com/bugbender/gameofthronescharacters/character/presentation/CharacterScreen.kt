@@ -14,7 +14,7 @@ fun CharacterScreen() {
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
 
     CharacterScreenContent(
-        screenState,
+        screenState = screenState,
         onRandomIconClick = viewModel::loadRandomCharacter,
     )
 }
@@ -32,7 +32,7 @@ fun CharacterScreenContent(
         is CharacterViewModel.ScreenState.Error -> {
             CharacterErrorContent(
                 errorMessage = screenState.message,
-                advice = "Do nothing my friend!!!",
+                advice = screenState.advice,
                 onTryAgainButtonClick = onRandomIconClick
             )
         }
