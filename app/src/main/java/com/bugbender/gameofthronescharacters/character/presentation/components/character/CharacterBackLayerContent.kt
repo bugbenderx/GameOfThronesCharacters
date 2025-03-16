@@ -61,7 +61,7 @@ fun CharacterBackLayerContent(
                 brush = Brush.linearGradient(
                     colors = listOf(
                         Color.Transparent,
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        Color.Black.copy(alpha = 0.6f)
                     )
                 )
             )
@@ -85,13 +85,13 @@ fun CharacterBackLayerContent(
         ) {
             Text(
                 text = stringResource(R.string.rank, rank),
-                color = MaterialTheme.colorScheme.surface,
+                color = Color.White,
                 style = MaterialTheme.typography.labelLarge
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text = character,
-                color = MaterialTheme.colorScheme.surface,
+                color = Color.White,
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Bold,
             )
@@ -106,7 +106,7 @@ fun CharacterBackLayerContent(
                             append(actor)
                         }
                     },
-                    color = MaterialTheme.colorScheme.surface,
+                    color = Color.White,
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier
                         .padding(start = 8.dp)
