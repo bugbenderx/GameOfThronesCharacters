@@ -1,5 +1,7 @@
 package com.bugbender.gameofthronescharacters.settings.presentation
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,16 +27,34 @@ import com.bugbender.gameofthronescharacters.settings.domain.ThemeMode
 import com.bugbender.gameofthronescharacters.settings.presentation.components.SettingsCard
 import com.bugbender.gameofthronescharacters.settings.presentation.components.ThemeCard
 
+
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel) {
     val themeMode by viewModel.themeModeStateFlow.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    val composeEmail: () -> Unit = {
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:") // Only email apps handle this.
+            putExtra(Intent.EXTRA_EMAIL, arrayOf("support@bugbender.com"))
+            putExtra(Intent.EXTRA_SUBJECT, "GoT: Characters Feedback")
+        }
+        context.startActivity(intent)
+    }
+
+    val openPrivacyPolicy: () -> Unit = {
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://sites.google.com/view/games-of-thrones-characters/home")
+        )
+        context.startActivity(intent)
+    }
 
     SettingsContent(
         themeMode = themeMode,
         onThemeModeChange = viewModel::changeTheme,
-        onRateAppCardClick = { },
-        onContactSupportCardClick = { },
-        onPrivacyPolicyCardClick = {},
+        onContactSupportCardClick = composeEmail,
+        onPrivacyPolicyCardClick = openPrivacyPolicy,
     )
 }
 
@@ -41,7 +62,6 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
 fun SettingsContent(
     themeMode: ThemeMode,
     onThemeModeChange: (ThemeMode) -> Unit,
-    onRateAppCardClick: () -> Unit,
     onContactSupportCardClick: () -> Unit,
     onPrivacyPolicyCardClick: () -> Unit,
 ) {
@@ -56,15 +76,16 @@ fun SettingsContent(
             text = stringResource(R.string.settings),
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.displaySmall,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
         ThemeCard(themeMode = themeMode, onThemeModeChange = onThemeModeChange)
         Spacer(Modifier.weight(1f))
-        SettingsCard(
-            onCardClick = onRateAppCardClick,
-            iconRes = R.drawable.star,
-            titleRes = R.string.rate_app
-        )
+//        SettingsCard(
+//            onCardClick = onRateAppCardClick,
+//            iconRes = R.drawable.star,
+//            titleRes = R.string.rate_app
+//        )
         SettingsCard(
             onCardClick = onContactSupportCardClick,
             iconRes = R.drawable.support,
@@ -85,7 +106,6 @@ private fun SettingsContentPreview() {
         SettingsContent(
             themeMode = ThemeMode.DARK,
             onThemeModeChange = {},
-            onRateAppCardClick = { },
             onContactSupportCardClick = { },
             onPrivacyPolicyCardClick = { }
         )

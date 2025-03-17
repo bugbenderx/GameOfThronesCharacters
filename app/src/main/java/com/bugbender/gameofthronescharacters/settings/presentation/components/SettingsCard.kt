@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.bugbender.gameofthronescharacters.R
 import com.bugbender.gameofthronescharacters.core.presentation.theme.GameOfThronesCharactersTheme
 
@@ -38,7 +39,7 @@ fun SettingsCard(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clickable(onClick = onCardClick)
-            .height(60.dp)
+            .height(50.dp)
             .fillMaxWidth()
             .drawBehind {
                 val strokeWidth = 0.5.dp.toPx()
@@ -56,13 +57,13 @@ fun SettingsCard(
             painter = painterResource(iconRes),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.size(28.dp)
+            modifier = Modifier.size(24.dp)
         )
         Spacer(Modifier.width(16.dp))
         Text(
             text = stringResource(titleRes),
             color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp)
         )
     }
 }
