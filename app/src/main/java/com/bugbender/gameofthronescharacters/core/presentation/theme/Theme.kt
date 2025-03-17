@@ -9,10 +9,25 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bugbender.gameofthronescharacters.settings.domain.ThemeMode
+import com.bugbender.gameofthronescharacters.settings.presentation.SettingsViewModel
+
+@Immutable
+open class FixedColorScheme(
+    val surface: Color = Color.Unspecified,
+    val onSurface: Color = Color.Unspecified,
+)
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -90,32 +105,55 @@ private val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
+val LocalFixedColorScheme = staticCompositionLocalOf {
+    FixedColorScheme()
+}
+val MaterialTheme.fixedColorScheme
+    @Composable get() = LocalFixedColorScheme.current
+
 @Composable
 fun GameOfThronesCharactersTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
-    content: @Composable () -> Unit
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
+    content: @Composable (SettingsViewModel) -> Unit
 ) {
+    val themeMode by settingsViewModel.themeModeStateFlow.collectAsStateWithLifecycle()
+
+    val isDarkMode = when (themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    }
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (isDarkMode) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> darkScheme
+        isDarkMode -> darkScheme
         else -> lightScheme
     }
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkMode
         }
     }
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
+
+    val fixedColors = FixedColorScheme(
+        surface = Color(0xFFE4E1E7),
+        onSurface = Color(0xFF474648)
     )
+
+    CompositionLocalProvider(LocalFixedColorScheme provides fixedColors) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = { content(settingsViewModel) }
+        )
+    }
 }

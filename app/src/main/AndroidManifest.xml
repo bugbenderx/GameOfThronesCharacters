@@ -18,7 +18,8 @@
         <activity
             android:name=".core.presentation.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.GameOfThronesCharacters">
+            android:theme="@style/Theme.GameOfThronesCharacters"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

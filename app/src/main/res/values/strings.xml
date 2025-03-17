@@ -17,4 +17,11 @@
     <string name="try_again">Try Again</string>
     <string name="description">Description</string>
     <string name="memorableMoments">Memorable moments</string>
+    <string name="rate_app">Rate App</string>
+    <string name="contact_support">Contact Support</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="theme">Theme</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="system">System</string>
 </resources>

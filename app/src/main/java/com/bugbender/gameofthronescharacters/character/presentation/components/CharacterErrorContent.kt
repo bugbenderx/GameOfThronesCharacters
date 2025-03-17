@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bugbender.gameofthronescharacters.R
 import com.bugbender.gameofthronescharacters.core.presentation.theme.GameOfThronesCharactersTheme
+import com.bugbender.gameofthronescharacters.core.presentation.theme.fixedColorScheme
 
 @Composable
 fun CharacterErrorContent(
@@ -47,7 +48,7 @@ fun CharacterErrorContent(
         ) {
             Text(
                 text = errorMessage,
-                color = MaterialTheme.colorScheme.surface,
+                color = MaterialTheme.fixedColorScheme.surface,
                 style = MaterialTheme.typography.displaySmall,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold
@@ -55,7 +56,7 @@ fun CharacterErrorContent(
             Spacer(Modifier.height(8.dp))
             Text(
                 text = advice,
-                color = MaterialTheme.colorScheme.surface,
+                color = MaterialTheme.fixedColorScheme.surface,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )

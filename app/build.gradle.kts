@@ -93,4 +93,6 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     testImplementation(libs.coil.test)
 
+    // Preferences DataStore
+    implementation(libs.androidx.datastore.preferences)
 }

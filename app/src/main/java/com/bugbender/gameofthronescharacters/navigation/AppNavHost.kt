@@ -13,9 +13,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.bugbender.gameofthronescharacters.character.presentation.CharacterScreen
+import com.bugbender.gameofthronescharacters.settings.presentation.SettingsScreen
+import com.bugbender.gameofthronescharacters.settings.presentation.SettingsViewModel
 
 @Composable
-fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
+fun AppNavHost(
+    settingsViewModel: SettingsViewModel,
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
 
     NavHost(
         navController = navController,
@@ -37,14 +43,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
             }
         }
         composable<SettingsRoute> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.onSurfaceVariant)
-            ) {
-                Text(text = "SettingsScreen")
-            }
+            SettingsScreen(settingsViewModel)
         }
     }
 }
