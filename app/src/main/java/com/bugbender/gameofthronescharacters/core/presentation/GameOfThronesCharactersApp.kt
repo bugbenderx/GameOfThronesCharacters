@@ -8,9 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.bugbender.gameofthronescharacters.navigation.AppNavHost
 import com.bugbender.gameofthronescharacters.navigation.AppNavigationBar
+import com.bugbender.gameofthronescharacters.settings.presentation.SettingsViewModel
 
 @Composable
-fun GameOfThronesCharactersApp() {
+fun GameOfThronesCharactersApp(settingsViewModel: SettingsViewModel) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -19,6 +20,7 @@ fun GameOfThronesCharactersApp() {
         },
     ) { innerPadding ->
         AppNavHost(
+            settingsViewModel = settingsViewModel,
             navController = navController,
             modifier = Modifier
                 .fillMaxSize()

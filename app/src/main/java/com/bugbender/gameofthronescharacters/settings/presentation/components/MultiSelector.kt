@@ -6,14 +6,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.Layout
@@ -37,13 +33,10 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bugbender.gameofthronescharacters.core.presentation.theme.GameOfThronesCharactersTheme
-import com.bugbender.gameofthronescharacters.core.presentation.theme.fixedColorScheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
-
-private const val AnimationDurationMillis = 500
 
 @Stable
 interface MultiSelectorState {
@@ -59,6 +52,7 @@ class MultiSelectorStateImpl(
     selectedOption: String,
     private val selectedColor: Color,
     private val unselectedColor: Color,
+    animationDurationMillis: Int,
 ) : MultiSelectorState {
 
     private var _selectedIndex = Animatable(options.indexOf(selectedOption).toFloat())
@@ -75,7 +69,7 @@ class MultiSelectorStateImpl(
     }
 
     private val animationSpec = tween<Float>(
-        durationMillis = AnimationDurationMillis,
+        durationMillis = animationDurationMillis,
         easing = FastOutSlowInEasing,
     )
 
@@ -125,12 +119,14 @@ fun rememberMultiSelectorState(
     selectedOption: String,
     selectedColor: Color,
     unSelectedColor: Color,
-) = remember {
+    animationDurationMillis: Int
+) = remember(selectedColor, unSelectedColor) {
     MultiSelectorStateImpl(
         options,
         selectedOption,
         selectedColor,
         unSelectedColor,
+        animationDurationMillis
     )
 }
 
@@ -145,29 +141,32 @@ fun MultiSelector(
     selectedOption: String,
     onOptionSelect: (String) -> Unit,
     cornerRadius: Dp = 8.dp,
-    selectedTextColor: Color = MaterialTheme.fixedColorScheme.surface,
-    unselectedTextColor: Color = MaterialTheme.fixedColorScheme.onSurface,
-    selectedBackgroundColor: Color = MaterialTheme.fixedColorScheme.onSurface,
-    unselectedBackgroundColor: Color = MaterialTheme.fixedColorScheme.surface,
+    selectedTextColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    unselectedTextColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    selectedBackgroundColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    unselectedBackgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    animationDurationMillis: Int,
     state: MultiSelectorState = rememberMultiSelectorState(
         options = options,
         selectedOption = selectedOption,
         selectedColor = selectedTextColor,
         unSelectedColor = unselectedTextColor,
+        animationDurationMillis = animationDurationMillis
     ),
     modifier: Modifier = Modifier,
 ) {
     require(options.size >= 2) { "This composable requires at least 2 options" }
     require(options.contains(selectedOption)) { "Invalid selected option [$selectedOption]" }
 
-    LaunchedEffect(key1 = options, key2 = selectedOption) {
+    LaunchedEffect(key1 = selectedOption) {
         state.selectOption(this, options.indexOf(selectedOption))
     }
 
     Layout(
-        modifier = modifier
-            .clip(shape = RoundedCornerShape(cornerRadius))
-            .background(unselectedBackgroundColor),
+        modifier = modifier.background(
+            color = unselectedBackgroundColor,
+            shape = RoundedCornerShape(cornerRadius)
+        ),
         content = {
             val colors = state.textColors
             options.forEachIndexed { index, option ->
@@ -190,10 +189,10 @@ fun MultiSelector(
             Box(
                 modifier = Modifier
                     .layoutId(MultiSelectorOption.Background)
-                    .clip(
+                    .background(
+                        color = selectedBackgroundColor,
                         shape = RoundedCornerShape(cornerRadius)
-                    )
-                    .background(selectedBackgroundColor),
+                    ),
             )
         }
     ) { measurables, constraints ->
@@ -226,55 +225,6 @@ fun MultiSelector(
     }
 }
 
-@Preview(widthDp = 412)
-@Composable
-fun PreviewMultiSelector() {
-    GameOfThronesCharactersTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.background,
-        ) {
-            val options1 = listOf("Lorem", "Ipsum", "Dolor")
-            var selectedOption1 by remember {
-                mutableStateOf(options1.first())
-            }
-            val options2 = listOf("Sit", "Amet", "Consectetur", "Elit", "Quis")
-            var selectedOption2 by remember {
-                mutableStateOf(options2.first())
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                MultiSelector(
-                    options = options1,
-                    selectedOption = selectedOption1,
-                    onOptionSelect = { option ->
-                        selectedOption1 = option
-                    },
-                    modifier = Modifier
-                        .padding(all = 16.dp)
-                        .fillMaxWidth()
-                        .height(56.dp)
-                )
-
-                MultiSelector(
-                    options = options2,
-                    selectedOption = selectedOption2,
-                    onOptionSelect = { option ->
-                        selectedOption2 = option
-                    },
-                    modifier = Modifier
-                        .padding(all = 16.dp)
-                        .fillMaxWidth()
-                        .height(56.dp)
-                )
-            }
-        }
-    }
-}
-
 @Preview
 @Composable
 private fun MultiSelectorPreview() {
@@ -284,6 +234,7 @@ private fun MultiSelectorPreview() {
             options = listOf("Light", "Dark", "System"),
             selectedOption = selectedOption,
             onOptionSelect = { selectedOption = it },
+            animationDurationMillis = 500,
             modifier = Modifier
                 .height(28.dp)
                 .width(210.dp)
