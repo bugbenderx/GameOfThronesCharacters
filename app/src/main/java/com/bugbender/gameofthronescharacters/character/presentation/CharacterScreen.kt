@@ -20,7 +20,7 @@ fun CharacterScreen() {
         val shareText = buildString {
             appendLine("🔥 Discover ${character.name} from Game of Thrones!")
             appendLine("Played by: ${character.actor}")
-            appendLine("Debuted in: ${character.debut}")
+            appendLine("Introduced in: ${character.debut}")
             appendLine("\n👉 Want to see more details, photos, and memorable moments?")
             appendLine("Download the app here:")
             appendLine("https://play.google.com/store/apps/details?id=com.bugbender.gameofthronescharacters")
