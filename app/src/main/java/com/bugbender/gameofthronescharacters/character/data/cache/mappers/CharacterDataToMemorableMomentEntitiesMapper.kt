@@ -1,6 +1,6 @@
 package com.bugbender.gameofthronescharacters.character.data.cache.mappers
 
-import com.bugbender.gameofthronescharacters.character.data.CharacterData
+import com.bugbender.gameofthronescharacters.core.data.CharacterData
 import com.bugbender.gameofthronescharacters.core.data.cache.models.MemorableMomentEntity
 
 object CharacterDataToMemorableMomentEntitiesMapper :

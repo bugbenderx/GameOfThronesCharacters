@@ -1,6 +1,6 @@
 package com.bugbender.gameofthronescharacters.character.data.cloud
 
-import com.bugbender.gameofthronescharacters.character.data.CharacterData
+import com.bugbender.gameofthronescharacters.core.data.CharacterData
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test

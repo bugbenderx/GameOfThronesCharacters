@@ -11,26 +11,33 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
 @InstallIn(ViewModelComponent::class)
 abstract class CharacterModule {
 
     @Binds
+    @ViewModelScoped
     abstract fun apiService(apiService: CharacterApiService.Impl): CharacterApiService
 
     @Binds
+    @ViewModelScoped
     abstract fun cloudDataSource(datasource: CharacterCloudDataSource.Impl): CharacterCloudDataSource
 
     @Binds
+    @ViewModelScoped
     abstract fun cacheDataSource(dataSource: FavoriteCharacterCacheDataSource.Impl): FavoriteCharacterCacheDataSource
 
     @Binds
+    @ViewModelScoped
     abstract fun imageLoader(imageLoader: LoadImage.Impl): LoadImage
 
     @Binds
+    @ViewModelScoped
     abstract fun handleError(handleError: HandleError.Impl): HandleError
 
     @Binds
+    @ViewModelScoped
     abstract fun repository(repository: CharacterRepositoryImpl): CharacterRepository
 }

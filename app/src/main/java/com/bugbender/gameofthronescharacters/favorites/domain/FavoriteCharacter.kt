@@ -1,6 +1,6 @@
-package com.bugbender.gameofthronescharacters.character.data
+package com.bugbender.gameofthronescharacters.favorites.domain
 
-data class CharacterData(
+data class FavoriteCharacter(
     val id: Int,
     val name: String,
     val actor: String,

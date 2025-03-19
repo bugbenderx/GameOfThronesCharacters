@@ -15,6 +15,7 @@ import com.bugbender.gameofthronescharacters.character.data.cloud.CharacterCloud
 import com.bugbender.gameofthronescharacters.character.domain.Character
 import com.bugbender.gameofthronescharacters.character.domain.CharacterRepository
 import com.bugbender.gameofthronescharacters.character.domain.LoadResult
+import com.bugbender.gameofthronescharacters.core.data.CharacterData
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -30,7 +31,7 @@ class CharacterRepositoryImplTest {
 
     private lateinit var repository: CharacterRepository
     private lateinit var cloudDataSource: FakeCharacterCloudDataSource
-    private lateinit var cacheDataSource: FavoriteCharacterCacheDataSource
+    private lateinit var cacheDataSource: FakeFavoriteCharacterCacheDataSource
     private lateinit var handleError: HandleError
     private val imageLoader = FakeImageLoader(context)
 
@@ -56,7 +57,7 @@ class CharacterRepositoryImplTest {
                 imageUrl = "url1",
                 description = "Description1",
                 memorableMoments = listOf("First memorable moment", "Second memorable moment"),
-                isFavorite = true
+                isFavorite = false
             )
         )
         assertEquals(expectedResult, actualResult)
@@ -85,7 +86,44 @@ class CharacterRepositoryImplTest {
         actualResult = repository.getRandom()
         assertNotEquals(expectedResult, actualResult)
         assertTrue(actualResult is LoadResult.Success)
+    }
 
+    @Test
+    fun addToFavorites_and_deleteFromFavorites() = runBlocking {
+        var actualResult = cacheDataSource.characters
+        assertTrue(actualResult.isEmpty())
+
+        repository.addToFavorites(
+            character = Character(
+                id = 22,
+                name = "Jon Snow",
+                actor = "Kit Harington",
+                debut = "Season 1",
+                imageUrl = "url1",
+                description = "Description1",
+                memorableMoments = listOf("First memorable moment", "Second memorable moment"),
+                isFavorite = false
+            )
+        )
+
+        actualResult = cacheDataSource.characters
+        val expectedResult = listOf(
+            CharacterData(
+                id = 22,
+                name = "Jon Snow",
+                actor = "Kit Harington",
+                debut = "Season 1",
+                imageUrl = "url1",
+                description = "Description1",
+                memorableMoments = listOf("First memorable moment", "Second memorable moment"),
+            )
+        )
+        assertEquals(expectedResult, actualResult)
+
+        repository.deleteFromFavorites(characterId = 22)
+
+        actualResult = cacheDataSource.characters
+        assertTrue(actualResult.isEmpty())
     }
 }
 
@@ -137,15 +175,18 @@ class FakeImageLoader(context: Context) : LoadImage {
 }
 
 class FakeFavoriteCharacterCacheDataSource : FavoriteCharacterCacheDataSource {
+
+    val characters = mutableListOf<CharacterData>()
+
     override suspend fun save(character: CharacterData) {
-        TODO("Not yet implemented")
+        characters.add(character)
     }
 
     override suspend fun deleteById(id: Int) {
-        TODO("Not yet implemented")
+        characters.removeAll { it.id == id }
     }
 
-    override suspend fun isExists(id: Int) = true // Pretend the character is a favorite
+    override suspend fun isExists(id: Int): Boolean = characters.find { it.id == id } != null
 }
 
 class FakeHandleError : HandleError {
