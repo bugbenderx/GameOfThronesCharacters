@@ -1,8 +1,8 @@
 package com.bugbender.gameofthronescharacters.character.data.cache
 
-import com.bugbender.gameofthronescharacters.character.data.CharacterData
 import com.bugbender.gameofthronescharacters.character.data.cache.mappers.CharacterDataToCharacterEntityMapper
 import com.bugbender.gameofthronescharacters.character.data.cache.mappers.CharacterDataToMemorableMomentEntitiesMapper
+import com.bugbender.gameofthronescharacters.core.data.CharacterData
 import com.bugbender.gameofthronescharacters.core.data.cache.CharacterDao
 import javax.inject.Inject
 

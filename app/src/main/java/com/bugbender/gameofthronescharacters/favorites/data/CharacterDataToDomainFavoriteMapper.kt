@@ -1,8 +1,9 @@
-package com.bugbender.gameofthronescharacters.character.data.cloud
+package com.bugbender.gameofthronescharacters.favorites.data
 
 import com.bugbender.gameofthronescharacters.core.data.CharacterData
+import com.bugbender.gameofthronescharacters.favorites.domain.FavoriteCharacter
 
-object CharacterDtoToDataMapper : CharacterDto.Mapper<CharacterData> {
+object CharacterDataToDomainFavoriteMapper : CharacterData.Mapper<FavoriteCharacter> {
     override fun map(
         id: Int,
         name: String,
@@ -11,7 +12,7 @@ object CharacterDtoToDataMapper : CharacterDto.Mapper<CharacterData> {
         imageUrl: String,
         description: String,
         memorableMoments: List<String>
-    ) = CharacterData(
+    ) = FavoriteCharacter(
         id = id,
         name = name,
         actor = actor,
