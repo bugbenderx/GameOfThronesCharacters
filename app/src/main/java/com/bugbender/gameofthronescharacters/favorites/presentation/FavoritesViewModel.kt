@@ -21,7 +21,6 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getAllFavorites()
                 .collect { list ->
-
                     if (list.isEmpty()) {
                         _screenState.value = ScreenState.Empty
                     } else {
@@ -30,12 +29,6 @@ class FavoritesViewModel @Inject constructor(
                         )
                     }
                 }
-        }
-    }
-
-    fun deleteFromFavorites(id: Int) {
-        viewModelScope.launch {
-            repository.delete(id)
         }
     }
 

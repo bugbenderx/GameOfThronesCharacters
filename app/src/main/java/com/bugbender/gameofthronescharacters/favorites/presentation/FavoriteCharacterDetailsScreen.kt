@@ -6,17 +6,16 @@ import com.bugbender.gameofthronescharacters.favorites.presentation.components.F
 
 @Composable
 fun FavoriteCharacterDetailsScreen(
-    viewModel: FavoritesViewModel,
     favoriteCharacterUi: FavoriteCharacterUi,
     navigateBack: () -> Unit
 ) {
-    val viewModel1 = hiltViewModel<FavoriteCharacterDetailViewModel>()
+    val viewModel = hiltViewModel<FavoriteCharacterDetailViewModel>()
 
     FavoriteCharacterDetails(
         characterUi = favoriteCharacterUi,
         onBackIconClick = navigateBack,
         onFavoriteIconClick = {
-            viewModel1.deleteFromFavorites(id = favoriteCharacterUi.id)
+            viewModel.deleteFromFavorites(id = favoriteCharacterUi.id)
             navigateBack()
         }
     )

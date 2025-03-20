@@ -4,7 +4,6 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,7 +14,6 @@ import com.bugbender.gameofthronescharacters.character.presentation.CharacterScr
 import com.bugbender.gameofthronescharacters.favorites.presentation.FavoriteCharacterDetailsScreen
 import com.bugbender.gameofthronescharacters.favorites.presentation.FavoriteCharacterUi
 import com.bugbender.gameofthronescharacters.favorites.presentation.FavoritesScreen
-import com.bugbender.gameofthronescharacters.favorites.presentation.FavoritesViewModel
 import com.bugbender.gameofthronescharacters.settings.presentation.SettingsScreen
 import com.bugbender.gameofthronescharacters.settings.presentation.SettingsViewModel
 import kotlinx.serialization.json.Json
@@ -27,11 +25,9 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    val viewModel = hiltViewModel<FavoritesViewModel>()
-
     NavHost(
         navController = navController,
-        startDestination = Graph.Favorites,
+        startDestination = Graph.Character,
         modifier = modifier
     ) {
         navigation<Graph.Character>(startDestination = Route.Character) {
@@ -45,7 +41,6 @@ fun AppNavHost(
 
             composable<Route.FavoriteCharacters> {
                 FavoritesScreen(
-                    viewModel = viewModel,
                     navigateToCharacterScreen = {
                         navController.navigate(Graph.Character.startDestination) {
                             popUpTo(Route.FavoriteCharacters) { inclusive = true }
@@ -64,7 +59,6 @@ fun AppNavHost(
                 val route = it.toRoute<Route.FavoriteCharacterDetails>()
 
                 FavoriteCharacterDetailsScreen(
-                    viewModel = viewModel,
                     favoriteCharacterUi = route.character,
                     navigateBack = { navController.navigateUp() }
                 )
