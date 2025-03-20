@@ -24,4 +24,8 @@
     <string name="light">Light</string>
     <string name="dark">Dark</string>
     <string name="system">System</string>
+    <string name="your_collection_is_empty">Your Collection is Empty</string>
+    <string name="add_characters">Add characters to your favorites and access them anytime</string>
+    <string name="start_exploring">Start Exploring</string>
+    <string name="back_icon_button">Back icon button</string>
 </resources>

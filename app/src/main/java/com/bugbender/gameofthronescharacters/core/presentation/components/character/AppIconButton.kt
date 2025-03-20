@@ -1,4 +1,4 @@
-package com.bugbender.gameofthronescharacters.character.presentation.components.character
+package com.bugbender.gameofthronescharacters.core.presentation.components.character
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

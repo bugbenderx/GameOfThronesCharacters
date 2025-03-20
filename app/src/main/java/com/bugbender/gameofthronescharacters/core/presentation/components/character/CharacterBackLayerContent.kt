@@ -1,4 +1,4 @@
-package com.bugbender.gameofthronescharacters.character.presentation.components.character
+package com.bugbender.gameofthronescharacters.core.presentation.components.character
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -41,11 +41,12 @@ fun CharacterBackLayerContent(
     rank: Int,
     character: String,
     actor: String,
-    introducedIn: String,
+    debut: String,
     isFavorite: Boolean,
-    onRandomIconClick: () -> Unit,
     onShareIconClick: () -> Unit,
     onFavoriteIconClick: () -> Unit,
+    topLayer: @Composable () -> Unit,
+    topLayerAlignment: Alignment
 ) {
     val painter = rememberAsyncImagePainter(
         model = imageUrl,
@@ -67,15 +68,14 @@ fun CharacterBackLayerContent(
             )
     ) {
 
-        AppIconButton(
-            onClick = onRandomIconClick,
-            iconId = R.drawable.random,
-            contentDescriptionId = R.string.next_random_character_icon_button,
+        Box(
             modifier = Modifier
-                .align(Alignment.TopEnd)
+                .align(topLayerAlignment)
                 .windowInsetsPadding(WindowInsets.statusBars)
                 .padding(16.dp)
-        )
+        ) {
+            topLayer()
+        }
 
         Column(
             modifier = Modifier
@@ -127,7 +127,7 @@ fun CharacterBackLayerContent(
                     text = buildAnnotatedString {
                         append("Introduced in ")
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(introducedIn)
+                            append(debut)
                         }
                     },
                     color = MaterialTheme.colorScheme.surface,
@@ -162,11 +162,12 @@ private fun CharacterBackLayerPreview() {
             rank = 3,
             character = "Jon Snow",
             actor = "Kit Harington",
-            introducedIn = "Season 1",
+            debut = "Season 1",
             isFavorite = false,
-            onRandomIconClick = {},
             onShareIconClick = {},
-            onFavoriteIconClick = {}
+            onFavoriteIconClick = {},
+            topLayer = {},
+            topLayerAlignment = Alignment.Center
         )
     }
 }

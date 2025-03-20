@@ -30,7 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.bugbender.gameofthronescharacters.R
-import com.bugbender.gameofthronescharacters.character.presentation.components.character.ExpandingBackDrop
+import com.bugbender.gameofthronescharacters.core.presentation.components.ExpandingBackDrop
 
 @Composable
 fun CharacterLoadingContent() {

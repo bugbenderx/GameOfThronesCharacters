@@ -40,7 +40,7 @@ class FavoriteCharactersRepositoryImplTest {
 
     @Test
     fun mainScenario() = runBlocking {
-        var actualFavoriteCharacters = cacheDataSource.getAll()
+        var actualFavoriteCharacters = cacheDataSource.getCharacters()
 
         val expectedFavoriteCharacters = listOf(
             CharacterData(
@@ -57,7 +57,7 @@ class FavoriteCharactersRepositoryImplTest {
 
         cacheDataSource.deleteById(id = 22)
 
-        actualFavoriteCharacters = cacheDataSource.getAll()
+        actualFavoriteCharacters = cacheDataSource.getCharacters()
         assertTrue(actualFavoriteCharacters.isEmpty())
     }
 }

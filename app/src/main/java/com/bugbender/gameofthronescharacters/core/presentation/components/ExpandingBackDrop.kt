@@ -1,4 +1,4 @@
-package com.bugbender.gameofthronescharacters.character.presentation.components.character
+package com.bugbender.gameofthronescharacters.core.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable

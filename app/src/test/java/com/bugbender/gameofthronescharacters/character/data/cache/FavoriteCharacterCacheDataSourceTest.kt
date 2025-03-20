@@ -8,6 +8,7 @@ import com.bugbender.gameofthronescharacters.core.data.cache.models.MemorableMom
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -72,10 +73,18 @@ class FakeCharacterDao : CharacterDao {
         return characters.any { it.id == id }
     }
 
-    override suspend fun getAll(): List<CharacterWithMemorableMoments> {
-        return characters.map { character ->
-            val moments = memorableMoments.filter { it.characterId == character.id }
-            CharacterWithMemorableMoments(characterEntity = character, memorableMoments = moments)
-        }
+    override fun getAll(): Flow<List<CharacterWithMemorableMoments>> {
+        TODO("Not yet implemented")
     }
+
+    override fun getById(id: Int): Flow<CharacterWithMemorableMoments?> {
+        TODO("Not yet implemented")
+    }
+
+//    override suspend fun getAll(): List<CharacterWithMemorableMoments> {
+//        return characters.map { character ->
+//            val moments = memorableMoments.filter { it.characterId == character.id }
+//            CharacterWithMemorableMoments(characterEntity = character, memorableMoments = moments)
+//        }
+//    }
 }

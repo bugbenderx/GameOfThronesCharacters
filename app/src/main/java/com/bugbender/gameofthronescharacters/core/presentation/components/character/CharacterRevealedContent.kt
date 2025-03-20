@@ -1,4 +1,4 @@
-package com.bugbender.gameofthronescharacters.character.presentation.components.character
+package com.bugbender.gameofthronescharacters.core.presentation.components.character
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
