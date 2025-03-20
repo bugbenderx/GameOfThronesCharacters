@@ -8,6 +8,7 @@ import com.bugbender.gameofthronescharacters.character.data.mappers.CharacterDom
 import com.bugbender.gameofthronescharacters.character.domain.Character
 import com.bugbender.gameofthronescharacters.character.domain.CharacterRepository
 import com.bugbender.gameofthronescharacters.character.domain.LoadResult
+import com.bugbender.gameofthronescharacters.core.data.CharacterData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -19,11 +20,17 @@ class CharacterRepositoryImpl @Inject constructor(
     private val handleError: HandleError
 ) : CharacterRepository {
 
+    private var lastCharacterId = -1
+
     override fun getFavorite(id: Int): Flow<Character?> =
         cacheDataSource.getById(id).map { it?.map(CharacterDataToDomainMapper(isFavorite = true)) }
 
     override suspend fun getRandom(): LoadResult = try {
-        val characterData = cloudDataSource.getRandom()
+        var characterData: CharacterData
+        do {
+            characterData = cloudDataSource.getRandom()
+        } while (characterData.id == lastCharacterId)
+        lastCharacterId = characterData.id
 
         val imageResult = imageLoader.download(characterData.imageUrl)
         if (imageResult is ErrorResult) throw imageResult.throwable
