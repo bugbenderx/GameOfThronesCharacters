@@ -1,27 +1,25 @@
 package com.bugbender.gameofthronescharacters.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import android.net.Uri
+import android.os.Bundle
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.bugbender.gameofthronescharacters.R
+import androidx.navigation.compose.navigation
+import androidx.navigation.toRoute
 import com.bugbender.gameofthronescharacters.character.presentation.CharacterScreen
-import com.bugbender.gameofthronescharacters.core.presentation.theme.fixedColorScheme
+import com.bugbender.gameofthronescharacters.favorites.presentation.FavoriteCharacterDetailsScreen
+import com.bugbender.gameofthronescharacters.favorites.presentation.FavoriteCharacterUi
+import com.bugbender.gameofthronescharacters.favorites.presentation.FavoritesScreen
+import com.bugbender.gameofthronescharacters.favorites.presentation.FavoritesViewModel
 import com.bugbender.gameofthronescharacters.settings.presentation.SettingsScreen
 import com.bugbender.gameofthronescharacters.settings.presentation.SettingsViewModel
+import kotlinx.serialization.json.Json
+import kotlin.reflect.typeOf
 
 @Composable
 fun AppNavHost(
@@ -29,44 +27,70 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val viewModel = hiltViewModel<FavoritesViewModel>()
 
     NavHost(
         navController = navController,
-        startDestination = CharacterRoute,
+        startDestination = Graph.Favorites,
         modifier = modifier
     ) {
-        composable<CharacterRoute> {
-            CharacterScreen()
-        }
-        composable<FavoritesRoute> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .paint(
-                        painter = painterResource(R.drawable.the_wall),
-                        contentScale = ContentScale.Crop
-                    )
+        navigation<Graph.Character>(startDestination = Route.Character) {
 
+            composable<Route.Character> {
+                CharacterScreen()
+            }
+        }
+
+        navigation<Graph.Favorites>(startDestination = Route.FavoriteCharacters) {
+
+            composable<Route.FavoriteCharacters> {
+                FavoritesScreen(
+                    viewModel = viewModel,
+                    navigateToCharacterScreen = {
+                        navController.navigate(Graph.Character.startDestination) {
+                            popUpTo(Route.FavoriteCharacters) { inclusive = true }
+                            restoreState = true
+                        }
+                    },
+                    navigateToFavoriteCharacterDetailsScreen = { favoriteCharacterUi ->
+                        navController.navigate(Route.FavoriteCharacterDetails(favoriteCharacterUi))
+                    }
+                )
+            }
+
+            composable<Route.FavoriteCharacterDetails>(
+                typeMap = mapOf(typeOf<FavoriteCharacterUi>() to FavoriteCharacterUiNavType)
             ) {
-                Text(
-                    text = "Will be implemented soon",
-                    color = MaterialTheme.fixedColorScheme.surface.copy(alpha = 0.5f),
-                    style = MaterialTheme.typography.displaySmall,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 32.dp)
+                val route = it.toRoute<Route.FavoriteCharacterDetails>()
+
+                FavoriteCharacterDetailsScreen(
+                    viewModel = viewModel,
+                    favoriteCharacterUi = route.character,
+                    navigateBack = { navController.navigateUp() }
                 )
             }
         }
-        composable<SettingsRoute> {
-            SettingsScreen(settingsViewModel)
+
+        navigation<Graph.Settings>(startDestination = Route.Settings) {
+
+            composable<Route.Settings> {
+                SettingsScreen(settingsViewModel)
+            }
         }
     }
 }
 
-fun NavHostController.navigateSingleTopTo(route: Route) = currentDestination?.let { destination ->
-    if (!destination.hasRoute(route::class)) {
-        popBackStack()
-        navigate(route)
-    }
+val FavoriteCharacterUiNavType = object : NavType<FavoriteCharacterUi>(isNullableAllowed = false) {
+
+    override fun put(bundle: Bundle, key: String, value: FavoriteCharacterUi) =
+        bundle.putString(key, Json.encodeToString(value))
+
+    override fun get(bundle: Bundle, key: String): FavoriteCharacterUi? =
+        bundle.getString(key)?.let { Json.decodeFromString(it) }
+
+    override fun serializeAsValue(value: FavoriteCharacterUi): String =
+        Uri.encode(Json.encodeToString(value))
+
+    override fun parseValue(value: String): FavoriteCharacterUi =
+        Json.decodeFromString(Uri.decode(value))
 }

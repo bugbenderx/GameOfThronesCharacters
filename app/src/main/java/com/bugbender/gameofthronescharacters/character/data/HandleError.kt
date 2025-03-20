@@ -1,6 +1,6 @@
 package com.bugbender.gameofthronescharacters.character.data
 
-import com.bugbender.gameofthronescharacters.core.ProvideStringRes
+import com.bugbender.gameofthronescharacters.core.utils.ProvideStringRes
 import java.net.UnknownHostException
 import javax.inject.Inject
 import javax.inject.Singleton

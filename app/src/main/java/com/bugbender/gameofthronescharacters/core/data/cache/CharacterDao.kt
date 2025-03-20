@@ -7,6 +7,7 @@ import androidx.room.Query
 import com.bugbender.gameofthronescharacters.core.data.cache.models.CharacterEntity
 import com.bugbender.gameofthronescharacters.core.data.cache.models.CharacterWithMemorableMoments
 import com.bugbender.gameofthronescharacters.core.data.cache.models.MemorableMomentEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CharacterDao {
@@ -21,7 +22,10 @@ interface CharacterDao {
     suspend fun isExists(id: Int): Boolean
 
     @Query("SELECT * FROM favorite_character")
-    suspend fun getAll(): List<CharacterWithMemorableMoments>
+    fun getAll(): Flow<List<CharacterWithMemorableMoments>>
+
+    @Query("SELECT * FROM favorite_character WHERE id=:id")
+    fun getById(id: Int): Flow<CharacterWithMemorableMoments?>
 
     @Query("DELETE FROM favorite_character WHERE id = :id")
     suspend fun deleteById(id: Int)

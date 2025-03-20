@@ -1,4 +1,4 @@
-package com.bugbender.gameofthronescharacters.favorites.data.cache
+package com.bugbender.gameofthronescharacters.core.data.cache
 
 import com.bugbender.gameofthronescharacters.core.data.CharacterData
 import com.bugbender.gameofthronescharacters.core.data.cache.models.CharacterEntity

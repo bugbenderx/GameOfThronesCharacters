@@ -1,4 +1,4 @@
-package com.bugbender.gameofthronescharacters.core
+package com.bugbender.gameofthronescharacters.core.utils
 
 import android.content.Context
 import com.bugbender.gameofthronescharacters.R

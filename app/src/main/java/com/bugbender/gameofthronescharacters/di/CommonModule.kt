@@ -1,6 +1,6 @@
 package com.bugbender.gameofthronescharacters.di
 
-import com.bugbender.gameofthronescharacters.core.ProvideStringRes
+import com.bugbender.gameofthronescharacters.core.utils.ProvideStringRes
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

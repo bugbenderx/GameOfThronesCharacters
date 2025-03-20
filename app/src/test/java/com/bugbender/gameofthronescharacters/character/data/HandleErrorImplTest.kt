@@ -1,6 +1,6 @@
 package com.bugbender.gameofthronescharacters.character.data
 
-import com.bugbender.gameofthronescharacters.core.ProvideStringRes
+import com.bugbender.gameofthronescharacters.core.utils.ProvideStringRes
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
