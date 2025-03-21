@@ -1,6 +1,5 @@
 package com.bugbender.gameofthronescharacters.character.presentation.components
 
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
@@ -13,6 +12,7 @@ import com.bugbender.gameofthronescharacters.core.presentation.components.charac
 import com.bugbender.gameofthronescharacters.core.presentation.components.character.CharacterRevealedContent
 import com.bugbender.gameofthronescharacters.core.presentation.components.character.CharacterTabs
 import com.bugbender.gameofthronescharacters.core.presentation.components.character.CharacterTopBar
+import com.bugbender.gameofthronescharacters.core.utils.shareCharacter
 
 @Composable
 fun CharacterDetails(
@@ -23,20 +23,13 @@ fun CharacterDetails(
 
     val context = LocalContext.current
     val onShareIconClick: () -> Unit = {
-        val shareText = buildString {
-            appendLine("🔥 Discover $characterUi.character from Game of Thrones!")
-            appendLine("Played by: $characterUi.actor")
-            appendLine("Introduced in: ${characterUi.debut}")
-            appendLine("\n👉 Want to see more details, photos, and memorable moments?")
-            appendLine("Download the app here:")
-            appendLine("https://play.google.com/store/apps/details?id=com.bugbender.gameofthronescharacters")
-        }
-
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, shareText)
-        }
-        context.startActivity(Intent.createChooser(intent, "Share via"))
+        shareCharacter(
+            context = context,
+            character = characterUi.name,
+            actor = characterUi.actor,
+            debut = characterUi.debut,
+            imageUrl = characterUi.imageUrl
+        )
     }
 
     ExpandingBackDrop(

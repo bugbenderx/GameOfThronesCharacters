@@ -26,7 +26,8 @@ fun FavoriteCharacterDetails(
             context = context,
             character = characterUi.name,
             actor = characterUi.actor,
-            debut = characterUi.debut
+            debut = characterUi.debut,
+            imageUrl = characterUi.imageUrl
         )
     }
 
