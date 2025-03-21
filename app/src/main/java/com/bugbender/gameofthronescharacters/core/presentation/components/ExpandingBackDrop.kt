@@ -170,7 +170,7 @@ fun ExpandingBackDrop(
 
         AnimatedVisibility(
             modifier = Modifier.align(Alignment.BottomEnd),
-            visible = showRevealedContent,
+            visible = showRevealedContent && isBackLayerDrawn,
             enter = fadeIn() + scaleIn(),
             exit = fadeOut() + scaleOut()
         ) {
