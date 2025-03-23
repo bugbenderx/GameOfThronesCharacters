@@ -20,8 +20,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bugbender.gameofthronescharacters.R
 import com.bugbender.gameofthronescharacters.core.presentation.theme.GameOfThronesCharactersTheme
 import com.bugbender.gameofthronescharacters.favorites.presentation.FavoritesViewModel.ScreenState
-import com.bugbender.gameofthronescharacters.favorites.presentation.components.EmptyFavorites
 import com.bugbender.gameofthronescharacters.favorites.presentation.components.FavoriteCharacters
+import com.bugbender.gameofthronescharacters.favorites.presentation.components.NoFavorites
 
 @Composable
 fun FavoritesScreen(
@@ -59,7 +59,7 @@ fun FavoritesContent(
 
         when (screenState) {
             is ScreenState.Empty -> {
-                EmptyFavorites(onStartExploringButtonClick = onStartExploringButtonClick)
+                NoFavorites(onStartExploringButtonClick = onStartExploringButtonClick)
             }
 
             is ScreenState.Characters -> {

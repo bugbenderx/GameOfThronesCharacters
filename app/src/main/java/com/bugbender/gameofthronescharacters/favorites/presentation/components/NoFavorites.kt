@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -24,11 +25,13 @@ import com.bugbender.gameofthronescharacters.R
 import com.bugbender.gameofthronescharacters.core.presentation.theme.GameOfThronesCharactersTheme
 
 @Composable
-fun EmptyFavorites(onStartExploringButtonClick: () -> Unit) {
+fun NoFavorites(onStartExploringButtonClick: () -> Unit) {
     Column(
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .safeDrawingPadding()
     ) {
         Text(
             text = stringResource(R.string.your_collection_is_empty),
@@ -67,6 +70,6 @@ fun EmptyFavorites(onStartExploringButtonClick: () -> Unit) {
 @Composable
 private fun EmptyFavoritesPreview() {
     GameOfThronesCharactersTheme {
-        EmptyFavorites(onStartExploringButtonClick = {})
+        NoFavorites(onStartExploringButtonClick = {})
     }
 }
