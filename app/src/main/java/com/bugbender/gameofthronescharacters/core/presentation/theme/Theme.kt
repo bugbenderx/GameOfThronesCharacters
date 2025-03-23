@@ -12,9 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -105,6 +107,14 @@ private val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
+enum class WindowType {
+    Compact, Expanded
+}
+
+val LocalWindowType = compositionLocalOf {
+    WindowType.Compact
+}
+
 val LocalFixedColorScheme = staticCompositionLocalOf {
     FixedColorScheme()
 }
@@ -141,15 +151,24 @@ fun GameOfThronesCharactersTheme(
         SideEffect {
             val window = (view.context as Activity).window
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkMode
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars =
+                !isDarkMode
         }
     }
+
+
+    val windowType = if (LocalConfiguration.current.screenWidthDp < 600)
+        WindowType.Compact else WindowType.Expanded
 
     val fixedColors = FixedColorScheme(
         surface = Color(0xFFE4E1E7),
         onSurface = Color(0xFF474648)
     )
 
-    CompositionLocalProvider(LocalFixedColorScheme provides fixedColors) {
+    CompositionLocalProvider(
+        LocalWindowType provides windowType,
+        LocalFixedColorScheme provides fixedColors
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,

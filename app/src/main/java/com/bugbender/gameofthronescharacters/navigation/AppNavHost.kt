@@ -3,7 +3,6 @@ package com.bugbender.gameofthronescharacters.navigation
 import android.net.Uri
 import android.os.Bundle
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,12 +22,10 @@ import kotlin.reflect.typeOf
 fun AppNavHost(
     settingsViewModel: SettingsViewModel,
     navController: NavHostController,
-    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
         startDestination = Graph.Character,
-        modifier = modifier
     ) {
         navigation<Graph.Character>(startDestination = Route.Character) {
 

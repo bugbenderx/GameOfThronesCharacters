@@ -2,6 +2,7 @@ package com.bugbender.gameofthronescharacters.core.presentation.components.chara
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -33,6 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bugbender.gameofthronescharacters.R
 import com.bugbender.gameofthronescharacters.core.presentation.theme.GameOfThronesCharactersTheme
+import com.bugbender.gameofthronescharacters.core.presentation.theme.LocalWindowType
+import com.bugbender.gameofthronescharacters.core.presentation.theme.WindowType
 import kotlinx.coroutines.launch
 
 sealed class CharacterTabs(@StringRes val textId: Int) {
@@ -44,16 +48,29 @@ sealed class CharacterTabs(@StringRes val textId: Int) {
 fun CharacterFrontLayerContent(
     tabs: List<CharacterTabs>,
     isScrollEnabled: Boolean,
+    modifier: Modifier = Modifier
 ) {
+    val windowType = LocalWindowType.current
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val selectedTabIndex by remember { derivedStateOf { pagerState.currentPage } }
 
     var availableHeightPx by remember { mutableIntStateOf(0) }
     var contentFullHeightPx by remember { mutableIntStateOf(0) }
+    val shouldEnableScroll by remember {
+        mutableStateOf(
+            if (windowType == WindowType.Compact)
+                contentFullHeightPx > availableHeightPx
+            else true
+        )
+    }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Row(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxSize()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+        ) {
 
             tabs.forEachIndexed { index, currentTab ->
                 val (tabColor, tabFontWeight) = if (tabs[selectedTabIndex] == currentTab)
@@ -65,6 +82,7 @@ fun CharacterFrontLayerContent(
                     color = tabColor,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = tabFontWeight,
+                    maxLines = 1,
                     modifier = Modifier.clickable(
                         onClick = {
                             scope.launch {
@@ -97,7 +115,7 @@ fun CharacterFrontLayerContent(
                     }
                     .verticalScroll(
                         state = rememberScrollState(),
-                        enabled = isScrollEnabled && (contentFullHeightPx > availableHeightPx)
+                        enabled = isScrollEnabled && shouldEnableScroll
                     )
             ) {
                 when (val tab = tabs[selectedTabIndex]) {
