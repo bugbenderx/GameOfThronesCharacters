@@ -18,20 +18,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil3.compose.rememberAsyncImagePainter
-import coil3.imageLoader
+import coil3.compose.AsyncImage
 import com.bugbender.gameofthronescharacters.R
 import com.bugbender.gameofthronescharacters.core.presentation.theme.GameOfThronesCharactersTheme
 
@@ -46,33 +46,43 @@ fun CharacterBackLayerContent(
     onShareIconClick: () -> Unit,
     onFavoriteIconClick: () -> Unit,
     topLayer: @Composable () -> Unit,
-    topLayerAlignment: Alignment
+    topLayerAlignment: Alignment,
+    topPadding: Dp,
+    bottomPadding: Dp,
+    modifier: Modifier = Modifier
 ) {
-    val painter = rememberAsyncImagePainter(
-        model = imageUrl,
-        imageLoader = LocalContext.current.imageLoader
-    )
-
-    Box(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.onSurface)
-            .fillMaxSize()
-            .paint(painter, contentScale = ContentScale.Crop)
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color.Transparent,
-                        Color.Black.copy(alpha = 0.6f)
+    Box(modifier = modifier.fillMaxSize()) {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.TopCenter,
+            modifier = Modifier.fillMaxWidth()
+        )
+        // LinearGradient
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .drawBehind {
+                    drawRect(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.6f)
+                            ),
+                            start = Offset(0f, 0f),
+                            end = Offset(0f, size.height)
+                        ),
+                        size = size
                     )
-                )
-            )
-    ) {
+                }
+        )
 
         Box(
             modifier = Modifier
                 .align(topLayerAlignment)
                 .windowInsetsPadding(WindowInsets.statusBars)
-                .padding(16.dp)
+                .padding(vertical = topPadding, horizontal = 16.dp)
         ) {
             topLayer()
         }
@@ -81,7 +91,11 @@ fun CharacterBackLayerContent(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(bottom = 32.dp, start = 16.dp, end = 16.dp)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = bottomPadding
+                )
         ) {
             Text(
                 text = stringResource(R.string.rank, rank),
@@ -167,6 +181,8 @@ private fun CharacterBackLayerPreview() {
             onShareIconClick = {},
             onFavoriteIconClick = {},
             topLayer = {},
+            topPadding = 16.dp,
+            bottomPadding = 32.dp,
             topLayerAlignment = Alignment.Center
         )
     }

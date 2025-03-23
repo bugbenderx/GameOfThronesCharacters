@@ -7,10 +7,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -31,9 +33,77 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.bugbender.gameofthronescharacters.R
 import com.bugbender.gameofthronescharacters.core.presentation.components.ExpandingBackDrop
+import com.bugbender.gameofthronescharacters.core.presentation.theme.LocalWindowType
+import com.bugbender.gameofthronescharacters.core.presentation.theme.WindowType
 
 @Composable
 fun CharacterLoadingContent() {
+    val windowType = LocalWindowType.current
+    when (windowType) {
+        WindowType.Compact -> {
+            CharacterLoadingCompact()
+        }
+
+        WindowType.Expanded -> {
+            CharacterLoadingExpanded()
+        }
+    }
+}
+
+@Composable
+fun CharacterLoadingExpanded() {
+    Row(
+        modifier = Modifier
+
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .shimmerEffect()
+                .weight(1f)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.character),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .size(36.dp)
+                    .align(Alignment.Center)
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .safeDrawingPadding()
+                .padding(horizontal = 16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .height(28.dp)
+                    .fillMaxWidth(0.5f)
+                    .shimmerEffect()
+            )
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+            repeat(10) {
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .height(16.dp)
+                        .fillMaxWidth()
+                        .shimmerEffect()
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun CharacterLoadingCompact() {
     ExpandingBackDrop(topBarContent = {}, backLayerContent = {
         Box(
             modifier = Modifier

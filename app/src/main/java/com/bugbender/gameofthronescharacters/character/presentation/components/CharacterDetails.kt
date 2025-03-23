@@ -1,8 +1,18 @@
 package com.bugbender.gameofthronescharacters.character.presentation.components
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.dp
 import com.bugbender.gameofthronescharacters.R
 import com.bugbender.gameofthronescharacters.character.presentation.CharacterUi
 import com.bugbender.gameofthronescharacters.core.presentation.components.ExpandingBackDrop
@@ -12,6 +22,8 @@ import com.bugbender.gameofthronescharacters.core.presentation.components.charac
 import com.bugbender.gameofthronescharacters.core.presentation.components.character.CharacterRevealedContent
 import com.bugbender.gameofthronescharacters.core.presentation.components.character.CharacterTabs
 import com.bugbender.gameofthronescharacters.core.presentation.components.character.CharacterTopBar
+import com.bugbender.gameofthronescharacters.core.presentation.theme.LocalWindowType
+import com.bugbender.gameofthronescharacters.core.presentation.theme.WindowType
 import com.bugbender.gameofthronescharacters.core.utils.shareCharacter
 
 @Composable
@@ -32,6 +44,35 @@ fun CharacterDetails(
         )
     }
 
+    val windowType = LocalWindowType.current
+    when (windowType) {
+        WindowType.Compact -> {
+            CharacterDetailsCompact(
+                onRandomIconClick = onRandomIconClick,
+                onFavoriteIconClick = onFavoriteIconClick,
+                onShareIconClick = onShareIconClick,
+                characterUi = characterUi
+            )
+        }
+
+        WindowType.Expanded -> {
+            CharacterDetailsExpanded(
+                onRandomIconClick = onRandomIconClick,
+                onFavoriteIconClick = onFavoriteIconClick,
+                onShareIconClick = onShareIconClick,
+                characterUi = characterUi
+            )
+        }
+    }
+}
+
+@Composable
+fun CharacterDetailsCompact(
+    onRandomIconClick: () -> Unit,
+    onFavoriteIconClick: () -> Unit,
+    onShareIconClick: () -> Unit,
+    characterUi: CharacterUi
+) {
     ExpandingBackDrop(
         topBarContent = {
             CharacterTopBar(
@@ -56,7 +97,9 @@ fun CharacterDetails(
                         contentDescriptionId = R.string.next_random_character_icon_button
                     )
                 },
-                topLayerAlignment = Alignment.TopEnd
+                topLayerAlignment = Alignment.TopEnd,
+                topPadding = 16.dp,
+                bottomPadding = 32.dp,
             )
         },
         frontLayerContent = { isScrollEnabled ->
@@ -76,4 +119,54 @@ fun CharacterDetails(
             )
         }
     )
+}
+
+@Composable
+fun CharacterDetailsExpanded(
+    onRandomIconClick: () -> Unit,
+    onFavoriteIconClick: () -> Unit,
+    onShareIconClick: () -> Unit,
+    characterUi: CharacterUi
+) {
+    Row {
+        CharacterBackLayerContent(
+            imageUrl = characterUi.imageUrl,
+            rank = characterUi.id,
+            character = characterUi.name,
+            actor = characterUi.actor,
+            debut = characterUi.debut,
+            isFavorite = characterUi.isFavorite,
+            onShareIconClick = onShareIconClick,
+            onFavoriteIconClick = onFavoriteIconClick,
+            topLayer = {
+                AppIconButton(
+                    onClick = onRandomIconClick,
+                    iconId = R.drawable.random,
+                    contentDescriptionId = R.string.next_random_character_icon_button
+                )
+            },
+            topLayerAlignment = Alignment.TopEnd,
+            topPadding = 0.dp,
+            bottomPadding = 4.dp + WindowInsets.navigationBars.asPaddingValues()
+                .calculateBottomPadding(),
+            modifier = Modifier.weight(1f)
+        )
+
+        CharacterFrontLayerContent(
+            tabs = listOf(
+                CharacterTabs.Description(text = characterUi.description),
+                CharacterTabs.MemorableMoments(list = characterUi.memorableMoments)
+            ),
+            isScrollEnabled = true,
+            modifier = Modifier
+                .weight(1f)
+                .padding(
+                    start = 16.dp,
+                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                    end = 8.dp + WindowInsets.navigationBars.asPaddingValues().calculateEndPadding(
+                        LocalLayoutDirection.current
+                    )
+                )
+        )
+    }
 }

@@ -23,7 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.AsyncImage
 import com.bugbender.gameofthronescharacters.favorites.presentation.FavoriteCharacterUi
 
 @Composable
@@ -48,7 +48,7 @@ fun FavoriteCharacter(
     onCharacterClick: (FavoriteCharacterUi) -> Unit
 ) {
     Row(modifier = Modifier.clickable(onClick = { onCharacterClick(characterUi) })) {
-        SubcomposeAsyncImage(
+        AsyncImage(
             model = characterUi.imageUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
