@@ -98,7 +98,11 @@ dependencies {
     // Preferences DataStore
     implementation(libs.androidx.datastore.preferences)
 
-    // In app updates
+    // In-app updates
     implementation(libs.app.update)
     implementation(libs.app.update.ktx)
+
+    // In-app reviews
+    implementation(libs.review)
+    implementation(libs.review.ktx)
 }
