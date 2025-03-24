@@ -2,6 +2,8 @@ package com.bugbender.gameofthronescharacters.navigation
 
 import android.net.Uri
 import android.os.Bundle
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -29,7 +31,21 @@ fun AppNavHost(
     ) {
         navigation<Graph.Character>(startDestination = Route.Character) {
 
-            composable<Route.Character> {
+            composable<Route.Character>(
+                enterTransition = {
+                    val enterTransition = slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(800)
+                    )
+                    enterTransition
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(500)
+                    )
+                }
+            ) {
                 CharacterScreen()
             }
         }
@@ -51,7 +67,13 @@ fun AppNavHost(
             }
 
             composable<Route.FavoriteCharacterDetails>(
-                typeMap = mapOf(typeOf<FavoriteCharacterUi>() to FavoriteCharacterUiNavType)
+                typeMap = mapOf(typeOf<FavoriteCharacterUi>() to FavoriteCharacterUiNavType),
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                        animationSpec = tween(500)
+                    )
+                }
             ) {
                 val route = it.toRoute<Route.FavoriteCharacterDetails>()
 
@@ -64,7 +86,20 @@ fun AppNavHost(
 
         navigation<Graph.Settings>(startDestination = Route.Settings) {
 
-            composable<Route.Settings> {
+            composable<Route.Settings>(
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(800)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(500)
+                    )
+                }
+            ) {
                 SettingsScreen(settingsViewModel)
             }
         }
