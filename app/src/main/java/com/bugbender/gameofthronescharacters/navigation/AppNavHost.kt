@@ -32,19 +32,19 @@ fun AppNavHost(
         navigation<Graph.Character>(startDestination = Route.Character) {
 
             composable<Route.Character>(
-                enterTransition = {
-                    val enterTransition = slideIntoContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                        animationSpec = tween(800)
-                    )
-                    enterTransition
-                },
-                exitTransition = {
-                    slideOutOfContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = tween(500)
-                    )
-                }
+//                enterTransition = {
+//                    val enterTransition = slideIntoContainer(
+//                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+//                        animationSpec = tween(800)
+//                    )
+//                    enterTransition
+//                },
+//                exitTransition = {
+//                    slideOutOfContainer(
+//                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+//                        animationSpec = tween(500)
+//                    )
+//                }
             ) {
                 CharacterScreen()
             }
@@ -52,7 +52,15 @@ fun AppNavHost(
 
         navigation<Graph.Favorites>(startDestination = Route.FavoriteCharacters) {
 
-            composable<Route.FavoriteCharacters> {
+            composable<Route.FavoriteCharacters>(
+                enterTransition = {
+                    val enterTransition = slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                        animationSpec = tween(500)
+                    )
+                    enterTransition
+                }
+            ) {
                 FavoritesScreen(
                     navigateToCharacterScreen = {
                         navController.navigate(Graph.Character.startDestination) {
