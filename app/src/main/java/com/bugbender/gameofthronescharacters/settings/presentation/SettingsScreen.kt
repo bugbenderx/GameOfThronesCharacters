@@ -31,9 +31,20 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
     val themeMode by viewModel.themeModeStateFlow.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    val rateApp: () -> Unit = {
+        val playIntent: Intent = Intent().apply {
+
+            action = Intent.ACTION_VIEW
+            data =
+                Uri.parse("https://play.google.com/store/apps/details?id=com.bugbender.gameofthronescharacters")
+
+        }
+        context.startActivity(playIntent)
+    }
+
     val composeEmail: () -> Unit = {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:") // Only email apps handle this.
+            data = Uri.parse("mailto:")
             putExtra(Intent.EXTRA_EMAIL, arrayOf("support@bugbender.com"))
             putExtra(Intent.EXTRA_SUBJECT, "GoT: Characters Feedback")
         }
@@ -52,6 +63,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
         themeMode = themeMode,
         onThemeModeChange = viewModel::changeTheme,
         onContactSupportCardClick = composeEmail,
+        onRateAppCardClick = rateApp,
         onPrivacyPolicyCardClick = openPrivacyPolicy,
     )
 }
@@ -60,6 +72,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
 fun SettingsContent(
     themeMode: ThemeMode,
     onThemeModeChange: (ThemeMode) -> Unit,
+    onRateAppCardClick: () -> Unit,
     onContactSupportCardClick: () -> Unit,
     onPrivacyPolicyCardClick: () -> Unit,
 ) {
@@ -79,11 +92,11 @@ fun SettingsContent(
         )
         ThemeCard(themeMode = themeMode, onThemeModeChange = onThemeModeChange)
         Spacer(Modifier.weight(1f))
-//        SettingsCard(
-//            onCardClick = onRateAppCardClick,
-//            iconRes = R.drawable.star,
-//            titleRes = R.string.rate_app
-//        )
+        SettingsCard(
+            onCardClick = onRateAppCardClick,
+            iconRes = R.drawable.star,
+            titleRes = R.string.rate_app
+        )
         SettingsCard(
             onCardClick = onContactSupportCardClick,
             iconRes = R.drawable.support,
@@ -104,6 +117,7 @@ private fun SettingsContentPreview() {
         SettingsContent(
             themeMode = ThemeMode.DARK,
             onThemeModeChange = {},
+            onRateAppCardClick = {},
             onContactSupportCardClick = { },
             onPrivacyPolicyCardClick = { }
         )
