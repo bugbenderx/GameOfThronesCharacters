@@ -147,7 +147,7 @@ fun ExpandingBackDrop(
                             frontLayerOffset.snapTo(
                                 (frontLayerOffset.value + delta).coerceIn(
                                     frontLayerMinTopOffset,
-                                    backLayerHeightPx.toFloat() - frontLayerTopCornerRadiusPx
+                                    frontLayerMaxTopOffset
                                 )
                             )
                         }
@@ -157,7 +157,7 @@ fun ExpandingBackDrop(
                         if (enableAutoSnap) {
                             coroutineScope.launch {
                                 val target =
-                                    if (frontLayerOffset.value < backLayerHeightPx / 2f)
+                                    if (frontLayerOffset.value - frontLayerMinTopOffset < ((frontLayerMaxTopOffset - frontLayerMinTopOffset) / 2f))
                                         frontLayerMinTopOffset
                                     else
                                         frontLayerMaxTopOffset
