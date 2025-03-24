@@ -2,7 +2,8 @@ package com.bugbender.gameofthronescharacters.core.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -153,15 +154,41 @@ fun ExpandingBackDrop(
                         }
                     },
                     orientation = Orientation.Vertical,
-                    onDragStopped = {
+                    onDragStopped = { velocity ->
                         if (enableAutoSnap) {
                             coroutineScope.launch {
-                                val target =
-                                    if (frontLayerOffset.value - frontLayerMinTopOffset < ((frontLayerMaxTopOffset - frontLayerMinTopOffset) / 2f))
-                                        frontLayerMinTopOffset
-                                    else
-                                        frontLayerMaxTopOffset
-                                frontLayerOffset.animateTo(target, tween(300))
+                                val dragRange = frontLayerMaxTopOffset - frontLayerMinTopOffset
+                                val topThreshold = frontLayerMinTopOffset + dragRange * 0.15f
+                                val bottomThreshold = frontLayerMaxTopOffset - dragRange * 0.15f
+
+                                val target = when {
+                                    frontLayerOffset.value <= topThreshold -> frontLayerMinTopOffset
+                                    frontLayerOffset.value >= bottomThreshold -> frontLayerMaxTopOffset
+
+                                    else -> {
+                                        if (velocity > 0) {
+                                            frontLayerMaxTopOffset
+                                        } else if (velocity < 0) {
+                                            frontLayerMinTopOffset
+                                        } else {
+                                            val distanceToTop =
+                                                frontLayerOffset.value - frontLayerMinTopOffset
+                                            val distanceToBottom =
+                                                frontLayerMaxTopOffset - frontLayerOffset.value
+                                            if (distanceToBottom > distanceToTop)
+                                                frontLayerMinTopOffset
+                                            else
+                                                frontLayerMaxTopOffset
+                                        }
+                                    }
+                                }
+                                frontLayerOffset.animateTo(
+                                    target,
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioNoBouncy,
+                                        stiffness = Spring.StiffnessLow
+                                    )
+                                )
                             }
                         }
                     }

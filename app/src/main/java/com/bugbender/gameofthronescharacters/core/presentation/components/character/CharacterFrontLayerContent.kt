@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -57,13 +56,6 @@ fun CharacterFrontLayerContent(
 
     var availableHeightPx by remember { mutableIntStateOf(0) }
     var contentFullHeightPx by remember { mutableIntStateOf(0) }
-    val shouldEnableScroll by remember {
-        mutableStateOf(
-            if (windowType == WindowType.Compact)
-                contentFullHeightPx > availableHeightPx
-            else true
-        )
-    }
 
     Column(modifier = modifier.fillMaxSize()) {
         Row(
@@ -115,7 +107,9 @@ fun CharacterFrontLayerContent(
                     }
                     .verticalScroll(
                         state = rememberScrollState(),
-                        enabled = isScrollEnabled && shouldEnableScroll
+                        enabled = isScrollEnabled && if (windowType == WindowType.Compact)
+                            contentFullHeightPx > availableHeightPx
+                        else true
                     )
             ) {
                 when (val tab = tabs[selectedTabIndex]) {
