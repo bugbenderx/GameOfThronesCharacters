@@ -1,5 +1,7 @@
 package com.bugbender.gameofthronescharacters.favorites.presentation
 
+import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,8 +11,10 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,12 +26,15 @@ import com.bugbender.gameofthronescharacters.core.presentation.theme.GameOfThron
 import com.bugbender.gameofthronescharacters.favorites.presentation.FavoritesViewModel.ScreenState
 import com.bugbender.gameofthronescharacters.favorites.presentation.components.FavoriteCharacters
 import com.bugbender.gameofthronescharacters.favorites.presentation.components.NoFavorites
+import com.google.android.play.core.review.ReviewManagerFactory
 
 @Composable
 fun FavoritesScreen(
     navigateToCharacterScreen: () -> Unit,
     navigateToFavoriteCharacterDetailsScreen: (FavoriteCharacterUi) -> Unit,
 ) {
+    val context = LocalContext.current
+    val activity = LocalActivity.current
     val viewModel = hiltViewModel<FavoritesViewModel>()
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
 
@@ -36,6 +43,12 @@ fun FavoritesScreen(
         onStartExploringButtonClick = navigateToCharacterScreen,
         onCharacterClick = { navigateToFavoriteCharacterDetailsScreen(it) }
     )
+
+    LaunchedEffect(Unit) {
+        activity?.let { safeActivity ->
+            launchInAppReview(safeActivity)
+        }
+    }
 }
 
 @Composable
@@ -68,6 +81,18 @@ fun FavoritesContent(
                     onCharacterClick = onCharacterClick
                 )
             }
+        }
+    }
+}
+
+fun launchInAppReview(activity: Activity) {
+    val reviewManager = ReviewManagerFactory.create(activity)
+    val request = reviewManager.requestReviewFlow()
+    request.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val reviewInfo = task.result
+            reviewManager.launchReviewFlow(activity, reviewInfo)
+
         }
     }
 }
