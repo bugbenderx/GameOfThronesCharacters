@@ -69,7 +69,9 @@ fun AppNavHost(
                         }
                     },
                     navigateToFavoriteCharacterDetailsScreen = { favoriteCharacterUi ->
-                        navController.navigate(Route.FavoriteCharacterDetails(favoriteCharacterUi))
+                        navController.navigate(Route.FavoriteCharacterDetails(favoriteCharacterUi)) {
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
