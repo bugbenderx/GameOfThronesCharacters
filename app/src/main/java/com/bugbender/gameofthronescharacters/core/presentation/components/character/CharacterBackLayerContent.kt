@@ -130,6 +130,7 @@ fun CharacterBackLayerContent(
                     onClick = onShareIconClick,
                     iconId = R.drawable.share,
                     contentDescriptionId = R.string.share_character_icon_button,
+                    preventMultipleClicks = true
                 )
             }
             Spacer(Modifier.height(16.dp))
