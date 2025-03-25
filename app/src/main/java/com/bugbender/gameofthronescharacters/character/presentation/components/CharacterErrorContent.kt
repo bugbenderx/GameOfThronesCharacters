@@ -39,7 +39,8 @@ fun CharacterErrorContent(
         Image(
             painter = painterResource(R.drawable.error_background),
             contentScale = ContentScale.Crop,
-            contentDescription = null
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
         )
         Column(
             verticalArrangement = Arrangement.Center,
