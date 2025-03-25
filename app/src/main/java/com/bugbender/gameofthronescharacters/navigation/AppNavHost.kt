@@ -31,21 +31,7 @@ fun AppNavHost(
     ) {
         navigation<Graph.Character>(startDestination = Route.Character) {
 
-            composable<Route.Character>(
-//                enterTransition = {
-//                    val enterTransition = slideIntoContainer(
-//                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
-//                        animationSpec = tween(800)
-//                    )
-//                    enterTransition
-//                },
-//                exitTransition = {
-//                    slideOutOfContainer(
-//                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
-//                        animationSpec = tween(500)
-//                    )
-//                }
-            ) {
+            composable<Route.Character> {
                 CharacterScreen()
             }
         }
