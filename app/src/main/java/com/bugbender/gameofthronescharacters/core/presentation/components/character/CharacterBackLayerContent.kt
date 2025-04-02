@@ -45,9 +45,9 @@ fun CharacterBackLayerContent(
     isFavorite: Boolean,
     onShareIconClick: () -> Unit,
     onFavoriteIconClick: () -> Unit,
-    topLayer: @Composable () -> Unit,
-    topLayerAlignment: Alignment,
-    topPadding: Dp,
+    topLayer: @Composable () -> Unit = {},
+    topLayerAlignment: Alignment = Alignment.TopCenter,
+    topPadding: Dp = 16.dp,
     bottomPadding: Dp,
     modifier: Modifier = Modifier
 ) {

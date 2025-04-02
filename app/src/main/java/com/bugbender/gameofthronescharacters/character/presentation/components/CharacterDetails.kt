@@ -28,7 +28,7 @@ import com.bugbender.gameofthronescharacters.core.utils.shareCharacter
 
 @Composable
 fun CharacterDetails(
-    onRandomIconClick: () -> Unit,
+    onRandomButtonClick: () -> Unit,
     onFavoriteIconClick: () -> Unit,
     characterUi: CharacterUi
 ) {
@@ -48,7 +48,7 @@ fun CharacterDetails(
     when (windowType) {
         WindowType.Compact -> {
             CharacterDetailsCompact(
-                onRandomIconClick = onRandomIconClick,
+                onRandomButtonClick = onRandomButtonClick,
                 onFavoriteIconClick = onFavoriteIconClick,
                 onShareIconClick = onShareIconClick,
                 characterUi = characterUi
@@ -57,7 +57,7 @@ fun CharacterDetails(
 
         WindowType.Expanded -> {
             CharacterDetailsExpanded(
-                onRandomIconClick = onRandomIconClick,
+                onRandomButtonClick = onRandomButtonClick,
                 onFavoriteIconClick = onFavoriteIconClick,
                 onShareIconClick = onShareIconClick,
                 characterUi = characterUi
@@ -68,7 +68,7 @@ fun CharacterDetails(
 
 @Composable
 fun CharacterDetailsCompact(
-    onRandomIconClick: () -> Unit,
+    onRandomButtonClick: () -> Unit,
     onFavoriteIconClick: () -> Unit,
     onShareIconClick: () -> Unit,
     characterUi: CharacterUi
@@ -90,15 +90,7 @@ fun CharacterDetailsCompact(
                 isFavorite = characterUi.isFavorite,
                 onShareIconClick = onShareIconClick,
                 onFavoriteIconClick = onFavoriteIconClick,
-                topLayer = {
-                    AppIconButton(
-                        onClick = onRandomIconClick,
-                        iconId = R.drawable.random,
-                        contentDescriptionId = R.string.next_random_character_icon_button
-                    )
-                },
-                topLayerAlignment = Alignment.TopEnd,
-                topPadding = 16.dp,
+
                 bottomPadding = 32.dp,
             )
         },
@@ -110,6 +102,9 @@ fun CharacterDetailsCompact(
                 ),
                 isScrollEnabled = isScrollEnabled
             )
+        },
+        floatActionButton = {
+            RandomFloatActionButton(onButtonClick = onRandomButtonClick)
         },
         revealedContent = {
             CharacterRevealedContent(
@@ -123,7 +118,7 @@ fun CharacterDetailsCompact(
 
 @Composable
 fun CharacterDetailsExpanded(
-    onRandomIconClick: () -> Unit,
+    onRandomButtonClick: () -> Unit,
     onFavoriteIconClick: () -> Unit,
     onShareIconClick: () -> Unit,
     characterUi: CharacterUi
@@ -140,12 +135,12 @@ fun CharacterDetailsExpanded(
             onFavoriteIconClick = onFavoriteIconClick,
             topLayer = {
                 AppIconButton(
-                    onClick = onRandomIconClick,
+                    onClick = onRandomButtonClick,
                     iconId = R.drawable.random,
                     contentDescriptionId = R.string.next_random_character_icon_button
                 )
             },
-            topLayerAlignment = Alignment.TopEnd,
+            topLayerAlignment = Alignment.TopStart,
             topPadding = 0.dp,
             bottomPadding = 4.dp + WindowInsets.navigationBars.asPaddingValues()
                 .calculateBottomPadding(),

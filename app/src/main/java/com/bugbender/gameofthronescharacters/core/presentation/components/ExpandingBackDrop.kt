@@ -62,7 +62,8 @@ fun ExpandingBackDrop(
     frontLayerTopCornerRadius: Dp = 16.dp,
     frontLayerPaddingContent: Dp = 8.dp,
     enableAutoSnap: Boolean = true,
-    revealedContent: @Composable () -> Unit,
+    floatActionButton: @Composable () -> Unit = {},
+    revealedContent: @Composable () -> Unit = {},
 ) {
     var parentHeightPx by remember { mutableIntStateOf(0) }
     var topBarHeightPx by remember { mutableIntStateOf(0) }
@@ -88,12 +89,15 @@ fun ExpandingBackDrop(
         derivedStateOf { frontLayerOffset.value == frontLayerMinTopOffset }
     }
 
+    val showFloatActionButton by remember {
+        derivedStateOf { frontLayerOffset.value >= frontLayerMaxTopOffset * 0.9F }
+    }
+
     val showRevealedContent by remember {
         derivedStateOf { frontLayerMinTopOffset + frontLayerPaddingContentPx > frontLayerOffset.value }
     }
 
     val coroutineScope = rememberCoroutineScope()
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -194,6 +198,17 @@ fun ExpandingBackDrop(
                     }
                 )
         )
+
+        AnimatedVisibility(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(24.dp),
+            visible = showFloatActionButton,
+            enter = scaleIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)),
+            exit = fadeOut() + scaleOut()
+        ) {
+            floatActionButton()
+        }
 
         AnimatedVisibility(
             modifier = Modifier.align(Alignment.BottomEnd),
@@ -306,6 +321,7 @@ private fun DraggableFrontLayerLayoutPreview() {
             frontLayerContent = {
                 Text("Front Layer - Drag Me!", fontSize = 24.sp, color = Color.Black)
             },
+            floatActionButton = {},
             revealedContent = {}
         )
     }

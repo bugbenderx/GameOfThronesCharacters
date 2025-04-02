@@ -104,44 +104,48 @@ fun CharacterLoadingExpanded() {
 
 @Composable
 fun CharacterLoadingCompact() {
-    ExpandingBackDrop(topBarContent = {}, backLayerContent = {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .shimmerEffect()
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.character),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .size(36.dp)
-                    .align(Alignment.Center)
-            )
-        }
-    }, frontLayerContent = {
-        Column {
+    ExpandingBackDrop(
+        backLayerContent = {
             Box(
                 modifier = Modifier
-                    .height(28.dp)
-                    .fillMaxWidth(0.5f)
+                    .fillMaxSize()
                     .shimmerEffect()
-            )
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.outlineVariant,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-            repeat(10) {
-                Box(
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.character),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .height(16.dp)
-                        .fillMaxWidth()
-                        .shimmerEffect()
+                        .size(36.dp)
+                        .align(Alignment.Center)
                 )
             }
-        }
-    }, revealedContent = {})
+        },
+        frontLayerContent = {
+            Column {
+                Box(
+                    modifier = Modifier
+                        .height(28.dp)
+                        .fillMaxWidth(0.5f)
+                        .shimmerEffect()
+                )
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                repeat(10) {
+                    Box(
+                        modifier = Modifier
+                            .padding(vertical = 4.dp)
+                            .height(16.dp)
+                            .fillMaxWidth()
+                            .shimmerEffect()
+                    )
+                }
+            }
+        },
+        topBarContent = { },
+    )
 }
 
 fun Modifier.shimmerEffect(): Modifier = composed {
