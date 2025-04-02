@@ -39,7 +39,7 @@ fun CharacterScreenContent(
         is CharacterViewModel.ScreenState.Success -> {
             CharacterDetails(
                 characterUi = screenState.character,
-                onRandomIconClick = onRandomIconClick,
+                onRandomButtonClick = onRandomIconClick,
                 onFavoriteIconClick = { onFavoriteIconClick(screenState.character) }
             )
         }
