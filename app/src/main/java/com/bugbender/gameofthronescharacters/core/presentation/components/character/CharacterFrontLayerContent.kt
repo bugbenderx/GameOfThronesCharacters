@@ -19,6 +19,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -51,7 +52,7 @@ fun CharacterFrontLayerContent(
     val windowType = LocalWindowType.current
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val selectedTabIndex by remember { mutableIntStateOf(pagerState.currentPage) }
+    val selectedTabIndex by remember { derivedStateOf { pagerState.currentPage } }
 
     var availableHeightPx by remember { mutableIntStateOf(0) }
     var contentFullHeightPx by remember { mutableIntStateOf(0) }
